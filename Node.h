@@ -1,0 +1,529 @@
+#ifndef NODE_H_INCLUDED
+#define NODE_H_INCLUDED
+
+/* ********************************************************************** */
+/*  THIS IS GENWAVE NODE */
+/* ********************************************************************** */
+
+#include <iostream>
+#include <stdio.h> // printf
+#include <map>
+#include <list>
+#include "Base.h"
+#include "IoJack.h"
+
+#define WeightAmp 2.0;
+
+namespace IoType {
+  enum IoType {Intra=0, GlobalIO=1, NbrIO=2};
+}
+const int DisuseThresh = 1;
+//typedef uint64_t UidType;
+//static UidType UidSource;
+
+//enum class IoType : uint8_t {Intra, Output};// will be valid in future C++11
+/* ********************************************************************** */
+class Node;
+typedef Node *NodePtr;
+typedef std::vector<NodePtr> NodeVec;
+typedef std::map<UidType, NodePtr> NodeMap;
+typedef std::map<UidType, NodePtr>::const_iterator NodeMapIterator;
+
+typedef double WeightType;
+/* ********************************************************************** */
+class Link;
+typedef Link *LinkPtr;
+class Link {
+public:
+  double Weight;
+  double FireVal;
+  UidType USID;
+  NodePtr USNode,DSNode;
+  int Disuse;
+  Link() {
+    this->FireVal=0.0;
+    this->USNode=NULL; this->DSNode=NULL;
+  }
+  LinkPtr Spawn() {
+    LinkPtr child = new Link();
+    child->USID = this->USID;
+    child->Weight = this->Weight;
+    child->Disuse = this->Disuse;
+    return child;
+  }
+  inline double GetFire() {
+    return this->FireVal*this->Weight;
+  }
+  static LinkPtr Abiogenate() {
+    LinkPtr lnp = new Link();
+    lnp->Disuse=0;
+    lnp->Mutate_Weight();
+    return lnp;
+  }
+  void Mutate_Weight() {
+    this->Weight = (frand()-0.5) * WeightAmp;// to do: do this with a distribution change
+  }
+  void Print_Me() {
+    printf("  Link USID:%li, ", this->USID);
+    printf("USNode:%p, DSNode:%p ", this->USNode, this->DSNode);
+    printf("Weight:%lf \n", this->Weight);
+  }
+};
+typedef std::vector<LinkPtr> LinkVec;
+/* ********************************************************************** */
+typedef void (Node::*FireFunc)(int);
+typedef void (*FireFunc2)(NodePtr);
+// typedef void (Person::*PPMF)();
+
+class Node {
+public:
+  UidType SpeciesId;
+  IoType::IoType MyType;//IOspecies type
+  IoDexType IoSpeciesId;// (chosen from master feed vector)
+  IoJackBasePtr Jack;
+
+  LinkVec LGenome;
+  LinkVec Working_Ins, Working_Outs;
+  double FireVal;
+  FireFunc SpecialFire;
+  FireFunc2 SpecialFire2;
+  /* ********************************************************************** */
+  void test(int ha){
+    //next;
+  }
+  static void test2(NodePtr ha){
+  }
+  /* ********************************************************************** */
+  Node() {
+    this->Jack = NULL;
+    this->FireVal = ((frand()*2.0)-1.0)*0.001;
+    this->SpecialFire = &Node::test;
+    this->SpecialFire2 = test2;
+  }
+  /* ********************************************************************** */
+  inline void testmore(){
+    (*this.*SpecialFire)(12);
+    (this->*SpecialFire)(12);
+
+    this->SpecialFire2(this);
+  }
+  /* ********************************************************************** */
+  ~Node() {
+    int sz = this->Working_Ins.size();
+    int cnt;
+    this->Working_Ins.clear();// probably not necessary
+    this->Working_Outs.clear();
+
+    for (cnt=0; cnt<this->LGenome.size(); cnt++) {
+      delete this->LGenome.at(cnt);
+    }
+    this->LGenome.clear();// probably not necessary
+  }
+  /* ********************************************************************** */
+  static NodePtr Abiogenate() {
+    NodePtr ndp = new Node();
+    ndp->Jack = NULL;
+    ndp->MyType = IoType::Intra;
+    ndp->SpeciesId = IdMaker::MakeId();
+    // ndp->FireVal = ((frand()*2.0)-1.0)*0.001;
+    return ndp;
+  }
+  /* ********************************************************************** */
+  NodePtr Spawn() {
+    // this just clones everything. we need to think about mating and mutation.
+    NodePtr parent, child;
+    LinkPtr lparent, lchild;
+    size_t siz = this->LGenome.size();
+    child = new Node();
+    child->MyType = this->MyType;
+    child->SpeciesId = this->SpeciesId;
+    child->LGenome.resize(siz);
+    // child->LGenome.insert( child->LGenome.end(), this->LGenome.begin(), this->LGenome.end() );
+    int sz = child->LGenome.size();
+    for (int cnt=0; cnt<siz; cnt++) {
+      lparent = this->LGenome.at(cnt);
+      lchild = lparent->Spawn();
+      child->LGenome.at(cnt) = lchild;
+    }
+    return child;
+  }
+  /* ********************************************************************** */
+  void Update_From_Feed() {
+    if (this->MyType == IoType::GlobalIO){
+    }
+    //this->FireVal = ActFun(Sum);
+  }
+  /* ********************************************************************** */
+  void Collect_And_Fire() {
+    LinkPtr ups;
+    double Sum=0;
+    size_t siz = this->Working_Ins.size();
+    for (int cnt=0; cnt<siz; cnt++) {
+      ups = this->Working_Ins.at(cnt);
+      Sum+=ups->GetFire();
+    }
+    this->FireVal = ActFun(Sum);
+    testmore();
+  }
+  /* ********************************************************************** */
+  double ActFun(double xin) {
+    double OutVal;
+    OutVal = xin / sqrt(1.0 + xin * xin);/* symmetrical sigmoid function in range -1.0 to 1.0. */
+    return OutVal;
+    /* General formula: double power = 2.0; OutVal = xin / Math.pow(1 + Math.abs(Math.pow(xin, power)), 1.0 / power); */
+  }
+  /* ********************************************************************** */
+  void Push_Fire() {
+    LinkPtr downs;
+    double MyFire=this->FireVal;
+    size_t siz = this->Working_Outs.size();
+    for (int cnt=0; cnt<siz; cnt++) {
+      downs = this->Working_Outs.at(cnt);
+      downs->FireVal = MyFire;
+    }
+  }
+  /* ********************************************************************** */
+  void Print_Me() {
+    //const void *address = static_cast<const void*>(this);
+    //void *address = (this);
+    void *address = &SpeciesId;
+    printf(" Node SpeciesId:%li, MyType:%li, this:%p\n", this->SpeciesId, this->MyType, address);
+    size_t siz = this->LGenome.size();
+    printf(" numlinks:%li\n", siz);
+    for (int cnt=0; cnt<siz; cnt++) {
+      LinkPtr lnk = this->LGenome.at(cnt);
+      lnk->Print_Me();
+    }
+  }
+  /* ********************************************************************** */
+  void Random_Increase(NodeVec *others, double dupequota) {
+    double rnum;
+    UidType lid, nid;// assumes links and nodes are already sorted by ID
+    int TempDex = 0;
+    int LDex = 0, NDex = 0;
+    int LSize = LGenome.size();
+    int OSize = others->size();
+    NodePtr ndp;
+    LinkPtr lnk0, lnk1;
+    LinkPtr temp[LSize + OSize];// NEEDS OPTIMIZING.  only create this array once for each Org
+    // to do: optimize this as 3 while loops inside one while loop
+    while (LDex < LSize && NDex < OSize) {
+      lnk0 = LGenome.at(LDex); lid = lnk0->USID;
+      ndp = others->at(NDex); nid = ndp->SpeciesId;
+      if (lid <= nid) {
+        temp[TempDex] = lnk0; TempDex++;// nodes are ahead of links, run until link equals or exceeds node
+        LDex++;
+        if (lid == nid) {NDex++;}// nodes are equal to links, run until tie is broken
+      } else {
+        rnum = frand();// links are ahead of nodes, race through nodes until node equals or exceeds link
+        if (rnum < dupequota) {
+          lnk1 = Link::Abiogenate(); lnk1->USID = nid;
+          temp[TempDex] = lnk1; TempDex++;
+        }
+        NDex++;
+      }
+    }
+    while (LDex < LSize) {
+      temp[TempDex] = LGenome.at(LDex);
+      LDex++; TempDex++;
+    }
+    while (NDex < OSize) {
+      rnum = frand();// links are ahead of nodes, race through nodes until node equals or exceeds link
+      if (rnum < dupequota) {
+        ndp = others->at(NDex);
+        lnk1 = Link::Abiogenate(); lnk1->USID = ndp->SpeciesId;
+        temp[TempDex] = lnk1; TempDex++;
+      }
+      NDex++;
+    }
+    LGenome.resize(TempDex);
+    for (int cnt=0; cnt<TempDex; cnt++) {
+      LGenome.at(cnt) = temp[cnt];
+    }
+  }
+  /* ********************************************************************** */
+  bool Is_Sorted() {
+    UidType ID_prev = 0;
+    LinkPtr lnp;
+    size_t siz = this->LGenome.size();
+    for (int cnt=0; cnt<siz; cnt++) {
+      lnp = this->LGenome.at(cnt);
+      if(ID_prev>lnp->USID) {
+        return false;
+      }
+      ID_prev=lnp->USID;
+    }
+    return true;
+  }
+  /* ********************************************************************** */
+  void Clean_Me() {
+    int ncnt, siz;// remove links that have not connected to anything in a long time.
+    LinkPtr lnp;
+    siz = this->LGenome.size();
+    int KeepCnt=0;
+    for (ncnt=0; ncnt<siz; ncnt++) {
+      lnp = this->LGenome.at(ncnt);
+      if (lnp->Disuse > DisuseThresh) {
+        printf("Disuse:%lu ",lnp->Disuse);
+      }
+      if (lnp->Disuse >= DisuseThresh) {
+        delete lnp;
+      } else {
+        this->LGenome.at(KeepCnt) = lnp; // pack them down
+        KeepCnt++;
+      }
+    }
+    this->LGenome.resize(KeepCnt);
+  }
+  /* ********************************************************************** */
+  void Clean_Inventory(UidVec *uvec) {
+    int ncnt, siz, nsiz;// remove links who don't connect to any known node ID in uvec.
+    int NDex;
+    LinkPtr lnp;
+    nsiz = uvec->size();
+    siz = this->LGenome.size();
+    int KeepCnt=0;
+    for (ncnt=0; ncnt<siz; ncnt++) {
+      lnp = this->LGenome.at(ncnt);
+      NDex = TreeSearchUidList(uvec, NDex, lnp->USID);
+      if (NDex < uvec->size() && (uvec->at(NDex) == lnp->USID) ) {
+        this->LGenome.at(KeepCnt) = lnp; // pack them down
+        KeepCnt++;
+      } else {
+        delete lnp;
+      }
+    }
+    this->LGenome.resize(KeepCnt);
+  }
+  /* ********************************************************************** */
+  void Mutate_Me(NodeVec *others) {
+    // Mutate my link list in situ.
+    int ncnt, siz;
+    double rnum, killquota, dupequota, monsterquota, rejackquota;
+    killquota = 0.0;// for testing
+    dupequota = 1.0;// for testing
+    monsterquota = 0.0;// for testing
+    killquota = dupequota = monsterquota = 0.5;// for testing
+    rejackquota = 0.01;
+    //dupequota = 1.0;
+    LinkPtr lnp, dupe;
+    siz = this->LGenome.size();
+    {
+      int KeepCnt=0;// first remove some
+      for (ncnt=0; ncnt<siz; ncnt++) {
+        rnum = frand();
+        lnp = this->LGenome.at(ncnt);
+        if (rnum < killquota) {
+          delete lnp;
+        } else {
+          this->LGenome.at(KeepCnt) = lnp; // pack them down
+          KeepCnt++;
+        }
+      }
+      this->LGenome.resize(KeepCnt);
+      siz = KeepCnt;
+    }
+    Random_Increase(others, dupequota);// then add some
+    // list of Links is not guaranteed to be sorted at this point!
+    this->Sort_Links();
+    {
+      for (ncnt=0; ncnt<siz; ncnt++) {// finally inner-mutate some
+        rnum = frand();
+        if (rnum < monsterquota) {
+          lnp = this->LGenome.at(ncnt);
+          lnp->Mutate_Weight();
+        }
+      }
+    }
+    rnum = frand();
+    if (rnum < rejackquota) {
+      int randint = rand()%3;
+      // no waitaminute, this creates a net flow from majority types to minority types, favoring an equal proportion of all IO types even when selection didn't like that.
+      this->MyType=static_cast<IoType::IoType>(randint);
+      // but, if most nodes come from duplication, and type-mutation is very rare, then proportion will tend to be perserved.
+    }
+  }
+  /* ********************************************************************** */
+  static bool AscendingLinkUid(LinkPtr b0, LinkPtr b1) {
+    return (b0->USID < b1->USID);
+  }
+  /* ********************************************************************** */
+  void Sort_Links() {
+    if (false) {
+      if(!Is_Sorted()) {
+        printf("LINKS NOT SORTED!!!");
+        throw 123;
+      }
+    }
+    std::sort (this->LGenome.begin(), this->LGenome.end(), AscendingLinkUid);
+  }
+#if false
+  /*
+  mutation:
+  can just mess with weights and node IDs.
+  but, also need to add or remove connections.
+  might be easiest to just create a second genome and copy it over. that may mean genome is a *link* to a genome vect.
+  or, mutation can happen in the event where the parent makes the child.  no post-natal mutation.  is postnat mutation easier?
+  but, mating must occur during spawning anyway, not afterward.
+
+  std::random_shuffle ( NGene.begin(), NGene.end() );// shuffle to randomize which duplicates are deleted
+  std::sort (NGene.begin(), NGene.end(), AscendingLinkUid);
+
+  sort links
+  for compile,
+  sort links
+  uint64_t startplace=0;
+  for each link {
+  startplace = TreeSearchLinkList(LinkVec *NList, startplace, UidType target) for right node, if found connect
+  }
+
+  for mutate,
+  for each link {// remove
+  maybe delete, pack in situ.
+  }
+  for each node {// add
+  maybe add link {
+    get node id
+    create link with that id and random weight
+    since nodes are sorted, this can be done as just a merge. in situ shifting is easy.
+  }
+  }
+  for each link {
+  maybe change weight
+  }
+
+  */
+#endif
+  /* ********************************************************************** */
+  void Compile_Me(NodeVec *others) {
+    size_t siz = this->LGenome.size();
+    int NDex;
+    UidType NbrId, NbrId_prev;
+    NodePtr nbr;
+    LinkPtr lns;
+    NbrId_prev = 0;
+    int cnt;
+    for (cnt=0; cnt<siz; cnt++) {
+      lns = this->LGenome.at(cnt);
+      NbrId = lns->USID;
+      NbrId_prev=NbrId;
+      NDex = TreeSearchNodeList(others, NDex, NbrId);// error, links may not be sorted here and they should be
+      if (NDex < others->size() && ((nbr = others->at(NDex))->SpeciesId == NbrId) ) {
+        this->Attach_US(nbr, lns);
+      } else {
+        lns->USNode = NULL; lns->DSNode = NULL; lns->Disuse++;
+      }
+    }
+    switch(this->MyType) {
+    case IoType::Intra: // do nothing, not an IO node
+      break;
+    case IoType::GlobalIO: // attach to global IO jack
+      break;
+    case IoType::NbrIO: // attach to neighbor IO jack
+      break;
+    }
+  }
+  /* ********************************************************************** */
+  void Attach_US(NodePtr other, LinkPtr ln) {// attach upstream node to me
+    this->Working_Ins.push_back(ln);// this approach uses less memory, fewer allocations/frees and is probably faster.
+    other->Working_Outs.push_back(ln);
+    ln->USNode = other; ln->DSNode = this;
+  }
+  /* ********************************************************************** */
+  int mainX () {
+    std::map<char,int> mymap;
+    std::map<char,int>::iterator iter;
+
+    mymap['a']=50;
+    mymap['b']=100;
+    mymap['c']=150;
+    mymap['d']=200;
+
+    iter=mymap.find('b');
+    mymap.erase (iter);
+    mymap.erase (mymap.find('d'));
+
+    // print content:
+    std::cout << "elements in mymap:" << '\n';
+    std::cout << "a => " << mymap.find('a')->second << '\n';
+    std::cout << "c => " << mymap.find('c')->second << '\n';
+
+    return 0;
+  }
+  /* ********************************************************************** */
+  static uint32_t TreeSearchUidList(UidVec *NList, uint64_t startplace, UidType target) {// assumes Node list has been sorted by ID, ascending
+    int LoDex, MedDex, HiDex;
+    UidType MedNode;
+    LoDex=startplace; HiDex=NList->size();
+    while (LoDex<HiDex) {
+      MedDex = (LoDex+HiDex)/2;
+      MedNode = NList->at(MedDex);
+      if (target <= MedNode) { HiDex = MedDex; }
+      else { LoDex = MedDex+1; }
+    }
+    return LoDex;
+  }
+  /* ********************************************************************** */
+  static uint32_t TreeSearchNodeList(NodeVec *NList, uint64_t startplace, UidType target) {// assumes Node list has been sorted by ID, ascending
+    int LoDex, MedDex, HiDex;
+    NodePtr MedNode;
+    LoDex=startplace; HiDex=NList->size();
+    while (LoDex<HiDex) {
+      MedDex = (LoDex+HiDex)/2;
+      MedNode = NList->at(MedDex);
+      if (target <= MedNode->SpeciesId) { HiDex = MedDex; }
+      else { LoDex = MedDex+1; }
+    }
+    return LoDex;
+  }
+  /* ********************************************************************** */
+  static uint32_t TreeSearchLinkList(LinkVec *LList, uint64_t startplace, UidType target) {// assumes Node list has been sorted by ID, ascending
+    int LoDex, MedDex, HiDex;
+    LinkPtr MedLink;
+    LoDex=startplace; HiDex=LList->size();
+    while (LoDex<HiDex) {
+      MedDex = (LoDex+HiDex)/2;
+      MedLink = LList->at(MedDex);
+      if (target <= MedLink->USID) { HiDex = MedDex; }
+      else { LoDex = MedDex+1; }
+    }
+    return LoDex;
+  }
+
+};
+
+#endif // NODE_H_INCLUDED
+
+#if false
+/*
+nodes can only add connections to nodes in their current org
+when a node mutates it changes id? not necessarily.
+lugar topology only matters for: picking mates, communication, where to put children.
+listener nodes are hard-coded and always the same IDs. mutations to listen to them are frequent.
+outputter nodes - did that already, how?
+maybe all nodes can have an input and output genome? result is union of both?
+foreach node {
+ foreach input {
+  lookup innode, if found {
+    add me to innode's out stack, for later real link
+  }
+ }
+ foreach output {
+  lookup outnode, if found {
+    add outnode to my stack, for later real link
+  }
+ }
+}
+
+each org has say 8 listeners and 8 talkers.
+
+or, every node can possibly be an output?  separate genome for each node.
+
+also, for comm to go big, aysnc reproduction.  only elim lowest in excessing pattern. but what of fat scores?
+scores are averages over time. initial score is global average?
+
+probably better in java
+
+*/
+#endif // false
+
