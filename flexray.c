@@ -272,14 +272,14 @@ void randtest()
     newleaf=malloc(sizeof(leafT)); newleaf->value=cnt;
     flexray_insert(&topnode,dex,newleaf);
   }
-  printf("ramcnt:%u, leaframcnt:%u.\n",ramcnt,leaframcnt);
+  bugprintf("ramcnt:%u, leaframcnt:%u.\n",ramcnt,leaframcnt);
 
   for (cnt=0;cnt<testsize;cnt+=1){
     dex=random()%maxuint32;
     newleaf=flexray_remove(&topnode,dex);
     if (newleaf!=NULL) free(newleaf);
   }
-  printf("randoms removed.\n");
+  bugprintf("randoms removed.\n");
   flexray_destroy(&topnode,&flexray_leaf_free);
 }/* randtest */
 
@@ -297,13 +297,13 @@ void consec_test()
     newleaf=malloc(sizeof(leafT)); newleaf->value=cnt;
     flexray_insert(&topnode,cnt,newleaf);
   }
-  printf("ramcnt:%u, leaframcnt:%u.\n",ramcnt,leaframcnt);
+  bugprintf("ramcnt:%u, leaframcnt:%u.\n",ramcnt,leaframcnt);
 
   for (cnt=0;cnt<testsize;cnt+=2){
     newleaf=flexray_remove(&topnode,cnt);
     if (newleaf!=NULL) free(newleaf);
   }
-  printf("consecutives removed.\n");
+  bugprintf("consecutives removed.\n");
   flexray_destroy(&topnode,&flexray_leaf_free);
 }/* consec_test */
 
@@ -316,7 +316,7 @@ int main()
   flexelT *helen=NULL,melvin;
   leafT *newleaf,*frieda,*wendy;
 
-  printf("Starting.\n\n\n");
+  bugprintf("Starting.\n\n\n");
 
 
   consec_test(); getchar(); return(0);
@@ -335,9 +335,9 @@ int main()
   wendy=flexray_remove(&melvin,0x76543210);
 //  wendy=flexray_remove(&melvin,0x01233210);
   if (wendy==NULL){
-    printf("NULL wendy:%x\n",wendy);
+    bugprintf("NULL wendy:%x\n",wendy);
   }else{
-    printf("wendy:%li\n",wendy->value);
+    bugprintf("wendy:%li\n",wendy->value);
     free(wendy);
   }
 
@@ -345,7 +345,7 @@ int main()
     newleaf=malloc(sizeof(leafT)); newleaf->value=cnt;
     flexray_insert(&melvin,cnt,newleaf);
   }
-  printf("ramcnt:%u, leaframcnt:%u.\n",ramcnt,leaframcnt);
+  bugprintf("ramcnt:%u, leaframcnt:%u.\n",ramcnt,leaframcnt);
 
   for (cnt=0;cnt<10000;cnt+=2){
     newleaf=flexray_remove(&melvin,cnt);
@@ -353,21 +353,21 @@ int main()
   }
   getchar();
 
-  printf("\n\n");
+  bugprintf("\n\n");
   frieda=flexray_lookup(&melvin,0x76543210);
   if (frieda==NULL){
-    printf("NULL frieda:%x\n",frieda);
+    bugprintf("NULL frieda:%x\n",frieda);
   }else{
-    printf("frieda:%li\n",frieda->value);
+    bugprintf("frieda:%li\n",frieda->value);
   }
   frieda=flexray_lookup(&melvin,0x7654f210);
   if (frieda==NULL){
-    printf("NULL frieda:%x\n",frieda);
+    bugprintf("NULL frieda:%x\n",frieda);
   }else{
-    printf("frieda:%li\n",frieda->value);
+    bugprintf("frieda:%li\n",frieda->value);
   }
 
-  printf("\n\n");
+  bugprintf("\n\n");
   flexray_destroy(&melvin,&flexray_leaf_free);
 //  205.156.14.66   ahbo2k
 

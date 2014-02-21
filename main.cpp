@@ -66,11 +66,11 @@ void TimeTest() {
 
   gettimeofday(&tm1, NULL);
 
-  printf("sum:%lf \n", sum);
+  bugprintf("sum:%lf \n", sum);
 
-  printf("tm0:%ld:%ld\n", tm0.tv_sec, tm0.tv_usec);
-  printf("tm1:%ld:%ld\n", tm1.tv_sec, tm1.tv_usec);
-  printf("\n");
+  bugprintf("tm0:%ld:%ld\n", tm0.tv_sec, tm0.tv_usec);
+  bugprintf("tm1:%ld:%ld\n", tm1.tv_sec, tm1.tv_usec);
+  bugprintf("\n");
 }
 
 void sorttest() {
@@ -88,15 +88,14 @@ void sorttest() {
   NDex = Node::TreeSearchNodeList(NList, 0, target);
   if (NDex < NList->size()) {
     node1 = NList->at(NDex);
-    printf("SpeciesId:%ld\n", node1->SpeciesId);
+    bugprintf("SpeciesId:%ld\n", node1->SpeciesId);
   } else {
-    printf("SpeciesId not found.\n");
+    bugprintf("SpeciesId not found.\n");
   }
 }
 
 const double uprecision = 1000000.0;
-
-double FullTime(struct timeval tm0) {
+double FullTime(struct timeval tm0) {// returns time in seconds and fractions of seconds
   return tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
 }
 
@@ -139,13 +138,13 @@ void maptest() {
       dummy+=3;
     }
     gettimeofday(&tm1, NULL);
-    printf("NOTHING but loop %li, %li\n", bigness, dummy);
-    printf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
-    printf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
+    bugprintf("NOTHING but loop %li, %li\n", bigness, dummy);
+    bugprintf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
+    bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    printf("delta:%lf\n", tf1-tf0);
-    printf("\n");
+    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("\n");
   }
   if (true) {
     leafT **ray = allocsafe(leafTPtr, bigness);
@@ -155,13 +154,13 @@ void maptest() {
     }
     gettimeofday(&tm1, NULL);
     freesafe(ray);
-    printf("ray %li\n", bigness);
-    printf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
-    printf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
+    bugprintf("ray %li\n", bigness);
+    bugprintf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
+    bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    printf("delta:%lf\n", tf1-tf0);
-    printf("\n");
+    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("\n");
   }
   if (true) {
     gettimeofday(&tm0, NULL);
@@ -169,29 +168,29 @@ void maptest() {
       fred0.push_back(newleaf);
     }
     gettimeofday(&tm1, NULL);
-    printf("vector push_back %li\n", bigness);
-    printf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
-    printf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
+    bugprintf("vector push_back %li\n", bigness);
+    bugprintf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
+    bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    printf("delta:%lf\n", tf1-tf0);
-    printf("\n");
+    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("\n");
   }
   if (false) {
     gettimeofday(&tm0, NULL);
     fred1.resize(bigness);
-    // printf("fred1 size %li\n", fred1.size());
+    // bugprintf("fred1 size %li\n", fred1.size());
     for (int cnt=0; cnt<bigness; cnt++) {
       fred1.at(cnt) = rnum;
     }
     gettimeofday(&tm1, NULL);
-    printf("vector at %li\n", bigness);
-    printf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
-    printf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
+    bugprintf("vector at %li\n", bigness);
+    bugprintf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
+    bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    printf("delta:%lf\n", tf1-tf0);
-    printf("\n");
+    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("\n");
   }
   if (true) {
     gettimeofday(&tm0, NULL);// hash
@@ -203,7 +202,7 @@ void maptest() {
     gettimeofday(&tm1, NULL);
 
     if(false) { // hash access
-      printf("hash access\n");
+      bugprintf("hash access\n");
       gettimeofday(&tm0, NULL);
       for (int cnt=0; cnt<bigness; cnt++) {
         //dex=rand()%maxuint32;
@@ -212,15 +211,15 @@ void maptest() {
       }
       gettimeofday(&tm1, NULL);
     }
-    printf("hash %li\n", bigness);
-    printf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
-    printf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
+    bugprintf("hash %li\n", bigness);
+    bugprintf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
+    bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    printf("delta:%lf\n", tf1-tf0);
-    printf("\n");
+    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("\n");
   }
-  //printf("flexray skip 13.\n");
+  //bugprintf("flexray skip 13.\n");
   if (true) {
     FR::Flexray<leafT> fray;// Flexray Class
     gettimeofday(&tm0, NULL);
@@ -231,7 +230,7 @@ void maptest() {
     }
     gettimeofday(&tm1, NULL);
     if (false) { // flexray access
-      printf("flexray access\n");
+      bugprintf("flexray access\n");
       gettimeofday(&tm0, NULL);
       for (cnt=0; cnt<bigness; cnt++) {
         //dex=rand()%INT32_MAX;
@@ -246,17 +245,17 @@ void maptest() {
         newleaf=fray.Remove(dex);
         if (newleaf!=NULL) freesafe(newleaf);
       }
-      printf("randoms removed.\n");
+      bugprintf("randoms removed.\n");
       fray.Destroy(&flexray_leaf_delete);
     }
 
-    printf("Flexray Class %li\n", bigness);
-    printf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
-    printf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
+    bugprintf("Flexray Class %li\n", bigness);
+    bugprintf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
+    bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    printf("delta:%lf\n", tf1-tf0);
-    printf("\n");
+    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("\n");
   }
   if (true) {
     flexelT topnode;// flexray C
@@ -274,7 +273,7 @@ void maptest() {
     }
     gettimeofday(&tm1, NULL);
     if (false) { // flexray access
-      printf("flexray access\n");
+      bugprintf("flexray access\n");
       gettimeofday(&tm0, NULL);
       for (cnt=0; cnt<bigness; cnt++) {
         //dex=rand()%maxuint32;
@@ -289,17 +288,17 @@ void maptest() {
         newleaf=flexray_remove(&topnode,dex);
         if (newleaf!=NULL) free(newleaf);
       }
-      printf("randoms removed.\n");
+      bugprintf("randoms removed.\n");
       flexray_destroy(&topnode,&flexray_leaf_free);
     }
 
-    printf("flexray %li\n", bigness);
-    printf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
-    printf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
+    bugprintf("flexray %li\n", bigness);
+    bugprintf("tm0:%ld.%ld\n", tm0.tv_sec, tm0.tv_usec);
+    bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    printf("delta:%lf\n", tf1-tf0);
-    printf("\n");
+    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("\n");
   }
   if (newleaf!=NULL) freesafe(newleaf);
 }
@@ -314,36 +313,40 @@ add inter-org communication
 
 /* ********************************************************************** */
 void PopSession() {
+  size_t PopMaxSize;
+  PopPtr pop;
+  OrgPtr org0;
+  uint32_t gencnt;
   // 3.129000 seconds for a pop of 100, for 100 generations
+  bugprintf("PopSession()\n");
   int NumGenerations = 100;
   int CleanPause = 1;//16
   //int NumGenerations = 1000000;// for about 10 hours
   int MaxSize=0, SumSize = 0, AvgSize=0;
-  uint32_t PopMaxSize;
-  PopPtr pop;
-  OrgPtr org0;
-  printf("Pop_Create!\n");
+
+  bugprintf("Pop_Create!\n");
   pop = new Pop();
-  printf("Pop Init! %lu\n", pop->forestv.size());
+  bugprintf("Pop Init! %lu\n", pop->forestv.size());
   LugarPtr lug;
   lug = pop->forestv.at(0);
-  printf("lug %lu\n", lug);
+  bugprintf("lug %lu\n", lug);
 
   Feed food;
+  bugprintf("GenerateTestPorts()\n");
   food.GenerateTestPorts();
 
   Org *org;
   org = lug->tenant;
-  printf("org %lu\n", org);
+  bugprintf("org %lu\n", org);
 
-  printf("Pop Init! %lu\n", pop->forestv.at(0));
+  bugprintf("Pop Init! %lu\n", pop->forestv.at(0));
   gettimeofday(&tm0, NULL);
-  uint32_t gencnt;
+  pop->Compile_Me();
   for (gencnt=0; gencnt<NumGenerations; gencnt++) {
     int numnodes = pop->forestv[0]->tenant->NGene.size();
-    printf("Pop_Gen! %lu, %lf, numnodes:%li\n", gencnt, pop->forestv[0]->tenant->Score, numnodes);
+    bugprintf("Pop_Gen! %lu, %lf, numnodes:%li\n", gencnt, pop->forestv[0]->tenant->Score[0], numnodes);
     pop->Gen();
-    pop->Mutate();
+    pop->Mutate(0.8, 0.8);
     if (gencnt % CleanPause == 0) {
       pop->Clean_Inventory();
     }
@@ -353,7 +356,7 @@ void PopSession() {
     PopMaxSize=pop->GetMaxSize();
     org0 = pop->forestv[0]->tenant;
     if (MaxSize<PopMaxSize) {
-      MaxSize= PopMaxSize;
+      MaxSize = PopMaxSize;
     }
     SumSize += org0->NGene.size();
   }
@@ -361,172 +364,26 @@ void PopSession() {
 
   {
     org0 = pop->forestv[0]->tenant;
-    printf("Org 0, gen:%li, ", NumGenerations-1);
+    bugprintf("Org 0, gen:%li, ", NumGenerations-1);
     org0->Print_Me();
-    printf("Org 0, gen:%li, ", NumGenerations-1);
+    bugprintf("Org 0, gen:%li, ", NumGenerations-1);
     AvgSize = SumSize/(double)NumGenerations;
-    printf("size:%li, MaxSize:%li, AvgSize:%lf\n", org0->NGene.size(), MaxSize, AvgSize);
+    bugprintf("size:%li, MaxSize:%li, AvgSize:%lf\n", org0->NGene.size(), MaxSize, AvgSize);
   }
 
   double t0 = FullTime(tm0);
   double t1 = FullTime(tm1);
   double delta = t1-t0;
-  printf("delta T:%lf\n", delta);
-  printf("Pop_Delete! %lf\n", pop->forestv[0]->tenant->Score);
+  bugprintf("delta T:%lf\n", delta);
+  bugprintf("Pop_Delete! %lf\n", pop->forestv[0]->tenant->Score[0]);
   delete pop;
 }
-
-#if false
-void randtest()
-/* *************************************************************
-************************************************************* */
-{
-  uint32 cnt,dex;
-  flexelT topnode;
-  leafT *newleaf;
-
-  flexray_init(&topnode);
-  for (cnt=0; cnt<testsize; cnt++) {
-    dex=rand()%maxuint32;
-    //newleaf=malloc(sizeof(leafT));
-    newleaf=allocsafe(leafT,1);
-    newleaf->value=cnt;
-    flexray_insert(&topnode,dex,newleaf);
-  }
-  //printf("ramcnt:%u, leaframcnt:%u.\n",ramcnt,leaframcnt);
-
-  for (cnt=0; cnt<testsize; cnt+=1) {
-    dex=rand()%maxuint32;
-    newleaf=flexray_remove(&topnode,dex);
-    if (newleaf!=NULL) free(newleaf);
-  }
-  printf("randoms removed.\n");
-  flexray_destroy(&topnode,&flexray_leaf_free);
-}/* randtest */
-
-void consec_test()
-/* *************************************************************
-************************************************************* */
-{
-  uint32 cnt;
-  flexelT topnode;
-  leafT *newleaf;
-
-  flexray_init(&topnode);
-
-  for (cnt=0; cnt<testsize; cnt++) {
-    // newleaf=malloc(sizeof(leafT));
-    newleaf=allocsafe(leafT,1);
-    newleaf->value=cnt;
-    flexray_insert(&topnode,cnt,newleaf);
-  }
-  //printf("ramcnt:%u, leaframcnt:%u.\n",ramcnt,leaframcnt);
-
-  for (cnt=0; cnt<testsize; cnt+=2) {
-    newleaf=flexray_remove(&topnode,cnt);
-    if (newleaf!=NULL) free(newleaf);
-  }
-  printf("consecutives removed.\n");
-  flexray_destroy(&topnode,&flexray_leaf_free);
-}/* consec_test */
-#endif
-
 
 /* ********************************************************************** */
 int main() {
   srand(time(NULL));
-
+  bugprintf("main()\n");
   PopSession(); return 0;
-
   maptest(); return 0;
-
-  // randtest(); return 0;
-
-  struct timeval tm0, tm1;
-  gettimeofday(&tm0, NULL);
-
-  {
-    OrgPtr org0, org1;
-    org0 = Org::Abiogenate();
-    org0->Mutate_Me();
-    org0->Compile_Me();
-    printf("\n\n\n");
-    org0->Print_Me();
-    if (false) {
-      org1 = org0->Spawn();
-      org1->Mutate_Me();
-      org1->Compile_Me();
-      printf("\n\n\n");
-      org1->Print_Me();
-      delete org1;
-    }
-    if (true) {
-      int MaxSize = 0;
-      double SumSize = 0;
-      int genlimit = 1000;
-      gettimeofday(&tm0, NULL);
-      for (int cnt=0; cnt<genlimit; cnt++) {
-        org1 = org0->Spawn();
-        delete org0; org0=org1;
-        org1->Mutate_Me();
-        org1->Compile_Me();
-        //if (cnt%10==0)
-        {
-          printf("gen:%li, size:%li\n", cnt, org1->NGene.size());
-        }
-        if (MaxSize<org1->NGene.size()) {
-          MaxSize= org1->NGene.size();
-        }
-        SumSize += org1->NGene.size();
-      }
-      gettimeofday(&tm1, NULL);
-      double AvgSize = SumSize/(double)genlimit;
-      printf("\n\n\n");
-      org1->Print_Me();
-      printf("Org 1, gen:%li, ", genlimit-1);
-      printf("size:%li, MaxSize:%li, AvgSize:%lf\n", org1->NGene.size(), MaxSize, AvgSize);
-      delete org1;
-
-      double t0 = FullTime(tm0);
-      double t1 = FullTime(tm1);
-      double delta = t1-t0;
-      printf("delta T:%lf\n", delta);
-    }
-    // delete org0;
-    return 0;
-  }
-
-  sorttest();
-  return 0;
-  // TimeTest(); return 0;
-  Pop *pop;
-  if (false) {
-    pop = new Pop();
-    cout << "Hello world!" << endl;
-    delete pop;
-  }
-
-  printf("Pop_Create!\n");
-  pop = new Pop();
-  printf("Pop Init! %lu\n", pop->forestv.size());
-  LugarPtr lug;
-  lug = pop->forestv.at(0);
-  printf("lug %lu\n", lug);
-
-  Org *org;
-  org = lug->tenant;
-  printf("org %lu\n", org);
-
-  printf("Pop Init! %lu\n", pop->forestv.at(0));
-
-  uint32_t gencnt;
-  for (gencnt=0; gencnt<100; gencnt++) {
-    printf("Pop_Gen! %lu, %lf\n", gencnt, pop->forestv[0]->tenant->Score);
-    pop->Gen();
-  }
-
-  printf("Pop_Delete! %lf\n", pop->forestv[0]->tenant->Score);
-  delete pop;
-
   return 0;
 }
