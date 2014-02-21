@@ -5,10 +5,13 @@
 #include <stdlib.h>     /* srand, rand */
 #include <string.h>
 #include <stdint.h>
+#include <float.h>
+
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <iostream>
 #include <vector> // example std::vector *vex;
+//#include <array>
 #include <hash_map>
 
 #include <algorithm>    // std::sort
@@ -17,6 +20,9 @@
 #include <time.h>       /* time */
 #include <sys/time.h>
 #include <stdio.h> // printf
+// #define __need___va_list
+#include <stdarg.h>
+#include <cstdarg>
 
 using namespace __gnu_cxx;
 
@@ -35,11 +41,24 @@ using namespace __gnu_cxx;
 #endif
 #ifndef int32_t
 #define int32_t int
+//#define INT32_MAX ((~(int32_t)0)>>1)
+//#define INT32_MIN (~(int32_t)0)
+#define INT32_MAX 2147483647
+#define INT32_MIN (-2147483647 - 1)
 #endif
 #ifndef uint32_t
 #define uint32_t unsigned int32_t
 #define INT32_MAX (~(uint32_t)0)
 #endif
+
+// #define Fudge (0.0000000000000000000001) // DBL_EPSILON  ?
+//#define Fudge (DBL_EPSILON*2)
+//#define Fudge (2.01e-015) // like epsilon, but epsilon tends to disappear during some math operations
+#define Fudge (2.01e-010) // like epsilon, but epsilon tends to disappear during some math operations
+
+//#ifndef override
+//#define override
+//#endif
 
 #define allocsafe(T, num) (T*)malloc(sizeof(T)*num)
 #define freesafe(obj) free(obj)
@@ -65,6 +84,31 @@ double frand() {
   return  ((double)rand()) / ((double)RAND_MAX);
 }
 
+int bugprintf(const char *format, ...){
+  int done;// = 1;
+  //return 1;
+
+  va_list arg;
+
+  va_start (arg, format);
+  done = vfprintf (stdout, format, arg);
+  va_end (arg);
+
+  return done;
+}
+
+namespace BitInt {
+  /* ********************************************************************** */
+  inline static double TransBit(int val, int bitnum) {
+    return ((double)((val >> bitnum)&0x1)) * 2.0 - 1.0;
+  }
+  inline static double TransInt(int val) {
+    return ((double)val) * 2.0 - 1.0;
+  }
+  inline static uint32_t Bit2Int(int val, int bitnum) {
+    return ((val >> bitnum)&0x1);
+  }
+}
 /* **************************************************************************** */
 static void Distribution() {
   int raysz = 10;// array size

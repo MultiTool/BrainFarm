@@ -5,7 +5,6 @@
 /*
 to do:
 make 2 orgs, one for networks and one of simple vectors.
-
 */
 #endif
 
@@ -30,7 +29,9 @@ typedef Org *OrgPtr;
 typedef std::vector<Org*> OrgVec;
 class Org {
 public:
-  double Score;
+  const static int NumScores = 2;
+  double Score[NumScores];
+  //double Score;
   struct Lugar *home;// my location
   NodeVec NGene;
   NodeVec *NGenePtr;
@@ -38,7 +39,9 @@ public:
   /* ********************************************************************** */
   Org() {
     NGenePtr = &(NGene);
-    this->Score = 0.0;
+    for (int cnt=0; cnt<NumScores; cnt++) {
+      this->Score[cnt] = 0.0;
+    }
     this->home = NULL;
   }
   /* ********************************************************************** */
@@ -55,7 +58,7 @@ public:
   /* ********************************************************************** */
   static OrgPtr Abiogenate() {
     OrgPtr org = new Org();
-    org->Mutate_Me();
+    org->Mutate_Me(1.0);// 100% mutated, no inherited genetic info
     return org;
   }
   /* ********************************************************************** */
@@ -72,8 +75,8 @@ public:
     }
   }
   /* ********************************************************************** */
-  void Init_Random() {
-    this->Mutate_Me();
+  void Rand_Init() {
+    this->Mutate_Me(1.0);
   }
   /* ********************************************************************** */
   void Random_Increase(double dupequota) {
@@ -110,17 +113,21 @@ public:
     }// Node list is not sorted at this point!
   }
   /* ********************************************************************** */
-  void Mutate_Me() {
+  void Mutate_Me(double MRate) {
     // Mutate my node list in situ.
     int ncnt, siz;
     double rnum, killquota, dupequota, monsterquota;
     killquota = dupequota = monsterquota = 0.5;// for testing
+    killquota = dupequota = monsterquota = MRate;// for testing
     killquota = 0.5;// for testing
     dupequota = 0.5;// for testing
     monsterquota = 0.5;// for testing
     NodePtr ndp, dupe;
-    siz = this->NGene.size();
     int KeepCnt=0;
+    siz = this->NGene.size();
+
+    this->Uncompile_Me();
+
     {
       // first remove some
       for (ncnt=0; ncnt<siz; ncnt++) {
@@ -159,24 +166,29 @@ public:
   OrgPtr Spawn() {
     OrgPtr child;
     child = new Org();
-    {
-      size_t siz = this->NGene.size();
-      NodePtr ndp;
-      child->NGene.resize(siz);
-      for (int cnt=0; cnt<siz; cnt++) {
-        ndp = this->NGene.at(cnt);
-        ndp = ndp->Spawn();
-        if (ndp==NULL) {
-          bool nop = true;
-        }
-        child->NGene.at(cnt) = ndp;
-      }
+    size_t siz = this->NGene.size();
+    NodePtr ndp;
+    child->NGene.resize(siz);
+    for (int cnt=0; cnt<siz; cnt++) {
+      ndp = this->NGene.at(cnt);
+      ndp = ndp->Spawn();
+      child->NGene.at(cnt) = ndp;
     }
     return child;
   }
   /* ********************************************************************** */
   static bool AscendingNodeUid(NodePtr b0, NodePtr b1) {
     return (b0->SpeciesId < b1->SpeciesId);
+  }
+  /* ********************************************************************** */
+  void Uncompile_Me() {
+    int ncnt, siz;// disconnect and clear all connections
+    NodePtr ndp;
+    siz = this->NGene.size();
+    for (ncnt=0; ncnt<siz; ncnt++) {
+      ndp = this->NGene.at(ncnt);
+      ndp->Uncompile_Me();
+    }
   }
   /* ********************************************************************** */
   void Compile_Me() {
@@ -187,7 +199,7 @@ public:
       Sort_Nodes();
     }
     if(!Is_Sorted()) {
-      printf("NODES NOT SORTED!!!");
+      bugprintf("NODES NOT SORTED!!!");
       throw 123;
     }
     if (false) {
@@ -199,6 +211,24 @@ public:
       ndp->Compile_Me(NGenePtr);
     }
     this->Gather_IoNodes();
+  }
+  /* ********************************************************************** */
+  void Clear_Score() {
+    for (int cnt=0; cnt<NumScores; cnt++) {
+      this->Score[cnt]=0.0;
+    }
+  }
+  /* ********************************************************************** */
+  void Oneify_Score() { // this is for accumulating scores by multiplication: Score *= subscore
+    for (int cnt=0; cnt<NumScores; cnt++) {
+      this->Score[cnt]=1.0;
+    }
+  }
+  /* ********************************************************************** */
+  void Rescale_Score(double Factor) {
+    for (int cnt=0; cnt<NumScores; cnt++) {
+      this->Score[cnt]*=Factor;
+    }
   }
   /* ********************************************************************** */
   void Update_From_Feed() {
@@ -404,15 +434,15 @@ public:
   }
   /* ********************************************************************** */
   void Print_Me() {
-    printf("Org\n");
+    bugprintf("Org\n");
     size_t siz = this->NGene.size();
-    printf("num nodes:%li\n", siz);
+    bugprintf("num nodes:%li\n", siz);
     for (int cnt=0; cnt<siz; cnt++) {
       NodePtr ndp = this->NGene.at(cnt);
       if (ndp==NULL) {
         bool nop = true;
       }
-      printf(" Node addr:%p\n", ndp);
+      bugprintf(" Node addr:%p\n", ndp);
       ndp->Print_Me();
     }
   }
@@ -423,6 +453,22 @@ public:
       NodePtr ndp = this->NGene.at(cnt);
       uvec->push_back(ndp->SpeciesId);
     }
+  }
+  /* ********************************************************************** */
+  void Print_Score() {
+    bugprintf(" Score:%lf, %lf\n", this->Score[0], this->Score[1]);
+  }
+  /* ********************************************************************** */
+  int Compare_Score(OrgPtr other) {
+    int cnt = 0;
+    double *ScoreMe, *ScoreYou;
+    ScoreMe=this->Score; ScoreYou=other->Score;
+    while (cnt<NumScores) {
+      if (ScoreMe[cnt]<ScoreYou[cnt]) {return 1;}
+      if (ScoreMe[cnt]>ScoreYou[cnt]) {return -1;}
+      cnt++;
+    }
+    return 0;
   }
 #if false
   /* ********************************************************************** */

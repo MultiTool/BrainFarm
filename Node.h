@@ -29,6 +29,7 @@ typedef std::vector<NodePtr> NodeVec;
 typedef std::map<UidType, NodePtr> NodeMap;
 typedef std::map<UidType, NodePtr>::const_iterator NodeMapIterator;
 
+static uint32_t bugcnt = 0;
 typedef double WeightType;
 /* ********************************************************************** */
 class Link;
@@ -41,8 +42,7 @@ public:
   NodePtr USNode,DSNode;
   int Disuse;
   Link() {
-    this->FireVal=0.0;
-    this->USNode=NULL; this->DSNode=NULL;
+    this->Clear();
   }
   LinkPtr Spawn() {
     LinkPtr child = new Link();
@@ -50,6 +50,10 @@ public:
     child->Weight = this->Weight;
     child->Disuse = this->Disuse;
     return child;
+  }
+  inline void Clear(){
+    this->FireVal=0.0;
+    this->USNode=NULL; this->DSNode=NULL;
   }
   inline double GetFire() {
     return this->FireVal*this->Weight;
@@ -64,9 +68,9 @@ public:
     this->Weight = (frand()-0.5) * WeightAmp;// to do: do this with a distribution change
   }
   void Print_Me() {
-    printf("  Link USID:%li, ", this->USID);
-    printf("USNode:%p, DSNode:%p ", this->USNode, this->DSNode);
-    printf("Weight:%lf \n", this->Weight);
+    bugprintf("  Link USID:%li, ", this->USID);
+    bugprintf("USNode:%p, DSNode:%p ", this->USNode, this->DSNode);
+    bugprintf("Weight:%lf \n", this->Weight);
   }
 };
 typedef std::vector<LinkPtr> LinkVec;
@@ -99,6 +103,8 @@ public:
     this->FireVal = ((frand()*2.0)-1.0)*0.001;
     this->SpecialFire = &Node::test;
     this->SpecialFire2 = test2;
+    this->Working_Ins.clear();// probably not necessary
+    this->Working_Outs.clear();
   }
   /* ********************************************************************** */
   inline void testmore(){
@@ -109,8 +115,7 @@ public:
   }
   /* ********************************************************************** */
   ~Node() {
-    int sz = this->Working_Ins.size();
-    int cnt;
+    size_t cnt;
     this->Working_Ins.clear();// probably not necessary
     this->Working_Outs.clear();
 
@@ -138,11 +143,12 @@ public:
     child->MyType = this->MyType;
     child->SpeciesId = this->SpeciesId;
     child->LGenome.resize(siz);
-    // child->LGenome.insert( child->LGenome.end(), this->LGenome.begin(), this->LGenome.end() );
-    int sz = child->LGenome.size();
-    for (int cnt=0; cnt<siz; cnt++) {
+    for (size_t cnt=0; cnt<siz; cnt++) {
       lparent = this->LGenome.at(cnt);
+      //bugprintf("lchild = lparent->Spawn(); cnt:%li, lparent:%p, bugcnt:%li\n", cnt, lparent, bugcnt);
       lchild = lparent->Spawn();
+      bugcnt++;
+      //bugprintf("child->LGenome.at(cnt) = lchild;%li\n", cnt);
       child->LGenome.at(cnt) = lchild;
     }
     return child;
@@ -163,7 +169,7 @@ public:
       Sum+=ups->GetFire();
     }
     this->FireVal = ActFun(Sum);
-    testmore();
+    //testmore();
   }
   /* ********************************************************************** */
   double ActFun(double xin) {
@@ -179,6 +185,7 @@ public:
     size_t siz = this->Working_Outs.size();
     for (int cnt=0; cnt<siz; cnt++) {
       downs = this->Working_Outs.at(cnt);
+      //printf("siz:%li, cnt:%li ", siz, cnt);
       downs->FireVal = MyFire;
     }
   }
@@ -187,9 +194,9 @@ public:
     //const void *address = static_cast<const void*>(this);
     //void *address = (this);
     void *address = &SpeciesId;
-    printf(" Node SpeciesId:%li, MyType:%li, this:%p\n", this->SpeciesId, this->MyType, address);
+    bugprintf(" Node SpeciesId:%li, MyType:%li, this:%p\n", this->SpeciesId, this->MyType, address);
     size_t siz = this->LGenome.size();
-    printf(" numlinks:%li\n", siz);
+    bugprintf(" numlinks:%li\n", siz);
     for (int cnt=0; cnt<siz; cnt++) {
       LinkPtr lnk = this->LGenome.at(cnt);
       lnk->Print_Me();
@@ -264,7 +271,7 @@ public:
     for (ncnt=0; ncnt<siz; ncnt++) {
       lnp = this->LGenome.at(ncnt);
       if (lnp->Disuse > DisuseThresh) {
-        printf("Disuse:%lu ",lnp->Disuse);
+        bugprintf("Disuse:%lu ",lnp->Disuse);
       }
       if (lnp->Disuse >= DisuseThresh) {
         delete lnp;
@@ -301,14 +308,14 @@ public:
     int ncnt, siz;
     double rnum, killquota, dupequota, monsterquota, rejackquota;
     killquota = 0.0;// for testing
-    dupequota = 1.0;// for testing
-    monsterquota = 0.0;// for testing
+    dupequota = 0.5;// for testing
+    monsterquota = 0.5;// for testing
     killquota = dupequota = monsterquota = 0.5;// for testing
     rejackquota = 0.01;
     //dupequota = 1.0;
     LinkPtr lnp, dupe;
     siz = this->LGenome.size();
-    {
+    if (true) {
       int KeepCnt=0;// first remove some
       for (ncnt=0; ncnt<siz; ncnt++) {
         rnum = frand();
@@ -351,7 +358,7 @@ public:
   void Sort_Links() {
     if (false) {
       if(!Is_Sorted()) {
-        printf("LINKS NOT SORTED!!!");
+        bugprintf("LINKS NOT SORTED!!!");
         throw 123;
       }
     }
@@ -394,6 +401,18 @@ public:
 
   */
 #endif
+/* ********************************************************************** */
+  void Uncompile_Me() {
+    LinkPtr lns;
+    size_t cnt;
+    size_t siz = this->LGenome.size();
+    this->Working_Ins.clear();
+    this->Working_Outs.clear();
+    for (cnt=0; cnt<siz; cnt++) {
+      lns = this->LGenome.at(cnt);
+      lns->Clear();
+    }
+  }
   /* ********************************************************************** */
   void Compile_Me(NodeVec *others) {
     size_t siz = this->LGenome.size();

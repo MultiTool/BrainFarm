@@ -16,3 +16,7 @@ obj/
 # Executable
 *.exe
 bin/
+
+# Code Blocks junk
+*.depend
+*.cbTemp
