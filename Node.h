@@ -28,7 +28,11 @@ typedef Node *NodePtr;
 typedef std::vector<NodePtr> NodeVec;
 typedef std::map<UidType, NodePtr> NodeMap;
 typedef std::map<UidType, NodePtr>::const_iterator NodeMapIterator;
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
 static uint32_t bugcnt = 0;
 typedef double WeightType;
 /* ********************************************************************** */
@@ -50,6 +54,10 @@ public:
     child->Weight = this->Weight;
     child->Disuse = this->Disuse;
     return child;
+  }
+  inline void Clear(){
+    this->FireVal=0.0;
+    this->USNode=NULL; this->DSNode=NULL;
   }
   inline void Clear(){
     this->FireVal=0.0;
@@ -102,7 +110,11 @@ public:
     this->Jack = NULL;
     this->FireVal = ((frand()*2.0)-1.0)*0.001;
     this->SpecialFire = &Node::test;
+<<<<<<< HEAD
     this->SpecialFire2 = test2;
+=======
+    this->SpecialFire2 = test2;
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
     this->Working_Ins.clear();// probably not necessary
     this->Working_Outs.clear();
   }
@@ -144,11 +156,19 @@ public:
     child->SpeciesId = this->SpeciesId;
     child->LGenome.resize(siz);
     for (size_t cnt=0; cnt<siz; cnt++) {
+<<<<<<< HEAD
       lparent = this->LGenome.at(cnt);
       //bugprintf("lchild = lparent->Spawn(); cnt:%li, lparent:%p, bugcnt:%li\n", cnt, lparent, bugcnt);
       lchild = lparent->Spawn();
       bugcnt++;
       //bugprintf("child->LGenome.at(cnt) = lchild;%li\n", cnt);
+=======
+      lparent = this->LGenome.at(cnt);
+      //bugprintf("lchild = lparent->Spawn(); cnt:%li, lparent:%p, bugcnt:%li\n", cnt, lparent, bugcnt);
+      lchild = lparent->Spawn();
+      bugcnt++;
+      //bugprintf("child->LGenome.at(cnt) = lchild;%li\n", cnt);
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
       child->LGenome.at(cnt) = lchild;
     }
     return child;
@@ -184,7 +204,11 @@ public:
     double MyFire=this->FireVal;
     size_t siz = this->Working_Outs.size();
     for (int cnt=0; cnt<siz; cnt++) {
+<<<<<<< HEAD
       downs = this->Working_Outs.at(cnt);
+=======
+      downs = this->Working_Outs.at(cnt);
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
       //printf("siz:%li, cnt:%li ", siz, cnt);
       downs->FireVal = MyFire;
     }
@@ -400,6 +424,7 @@ public:
   }
 
   */
+<<<<<<< HEAD
 #endif
 /* ********************************************************************** */
   void Uncompile_Me() {
@@ -412,6 +437,20 @@ public:
       lns = this->LGenome.at(cnt);
       lns->Clear();
     }
+=======
+#endif
+/* ********************************************************************** */
+  void Uncompile_Me() {
+    LinkPtr lns;
+    size_t cnt;
+    size_t siz = this->LGenome.size();
+    this->Working_Ins.clear();
+    this->Working_Outs.clear();
+    for (cnt=0; cnt<siz; cnt++) {
+      lns = this->LGenome.at(cnt);
+      lns->Clear();
+    }
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
   }
   /* ********************************************************************** */
   void Compile_Me(NodeVec *others) {

@@ -34,7 +34,10 @@
 		</Build>
 		<Compiler>
 			<Add option="-O" />
+<<<<<<< HEAD
 			<Add option="-std=c++11" />
+=======
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>

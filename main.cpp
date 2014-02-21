@@ -396,12 +396,21 @@ public:
   }
 };
 /* ********************************************************************** */
+<<<<<<< HEAD
 void PopSession() {
   size_t PopMaxSize;
   PopPtr pop;
   OrgPtr org0;
   uint32_t gencnt;
   // 3.129000 seconds for a pop of 100, for 100 generations
+=======
+void PopSession() {
+  size_t PopMaxSize;
+  PopPtr pop;
+  OrgPtr org0;
+  uint32_t gencnt;
+  // 3.129000 seconds for a pop of 100, for 100 generations
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
   bugprintf("PopSession()\n");
   int NumGenerations = 100;
   int CleanPause = 1;//16
@@ -415,7 +424,11 @@ void PopSession() {
   lug = pop->forestv.at(0);
   bugprintf("lug %lu\n", lug);
 
+<<<<<<< HEAD
   Feed food;
+=======
+  Feed food;
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
   bugprintf("GenerateTestPorts()\n");
   food.GenerateTestPorts();
 
@@ -424,11 +437,19 @@ void PopSession() {
   bugprintf("org %lu\n", org);
 
   bugprintf("Pop Init! %lu\n", pop->forestv.at(0));
+<<<<<<< HEAD
   gettimeofday(&tm0, NULL);
   pop->Compile_Me();
   for (gencnt=0; gencnt<NumGenerations; gencnt++) {
     int numnodes = pop->forestv[0]->tenant->NGene.size();
     bugprintf("Pop_Gen! %lu, %lf, numnodes:%li\n", gencnt, pop->forestv[0]->tenant->Score[0], numnodes);
+=======
+  gettimeofday(&tm0, NULL);
+  pop->Compile_Me();
+  for (gencnt=0; gencnt<NumGenerations; gencnt++) {
+    int numnodes = pop->forestv[0]->tenant->NGene.size();
+    bugprintf("Pop_Gen! %lu, %lf, numnodes:%li\n", gencnt, pop->forestv[0]->tenant->Score[0], numnodes);
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
     pop->Gen();
     pop->Mutate(0.8, 0.8);
     if (gencnt % CleanPause == 0) {
@@ -464,11 +485,16 @@ void PopSession() {
 }
 
 /* ********************************************************************** */
+<<<<<<< HEAD
 int main() {
   srand(time(NULL));
   Hilos hil;
   hil.ThreadTest2(); return 0;;
   ThreadTest(); return 0;;
+=======
+int main() {
+  srand(time(NULL));
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
   bugprintf("main()\n");
   PopSession(); return 0;
   maptest(); return 0;

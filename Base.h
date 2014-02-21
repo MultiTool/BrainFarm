@@ -19,9 +19,15 @@
 #include <cmath>  /* for std::abs(double) */
 #include <time.h>       /* time */
 #include <sys/time.h>
+<<<<<<< HEAD
 #include <stdio.h> // printf
 // #define __need___va_list
 #include <stdarg.h>
+=======
+#include <stdio.h> // printf
+// #define __need___va_list
+#include <stdarg.h>
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
 #include <cstdarg>
 
 using namespace __gnu_cxx;
@@ -83,6 +89,7 @@ public:
 double frand() {
   return  ((double)rand()) / ((double)RAND_MAX);
 }
+<<<<<<< HEAD
 
 int bugprintf(const char *format, ...){
   int done;// = 1;
@@ -96,6 +103,21 @@ int bugprintf(const char *format, ...){
 
   return done;
 }
+=======
+
+int bugprintf(const char *format, ...){
+  int done;// = 1;
+  //return 1;
+
+  va_list arg;
+
+  va_start (arg, format);
+  done = vfprintf (stdout, format, arg);
+  va_end (arg);
+
+  return done;
+}
+>>>>>>> 523f4dcca7048aa2ef9228854822ef39fe5e4ef7
 
 namespace BitInt {
   /* ********************************************************************** */
