@@ -7,9 +7,11 @@
 typedef class Feed *FeedPtr;
 class Feed {
 public:
+  uint64_t Generation;
   std::vector<GlobalIoJackPtr> Ports;
   /* ********************************************************************** */
   Feed(){
+    Generation = 0;
   }
   /* ********************************************************************** */
   ~Feed(){
@@ -57,6 +59,16 @@ public:
   void NextGen(){
     // in wiki, reads 1 new char from wiki, blanks all ports, and sets port[char] value to 1.0.
     // in massively parallel, goes through whole list and updates values for every jack.
+    GlobalIoJackPtr Jack;
+    size_t siz = Ports.size();
+    for(int cnt=0;cnt<siz;cnt++){
+       Jack = Ports.at(cnt);
+       Jack->Value = -1.0;
+    }
+    size_t LivePortDex = Generation % siz;
+    Jack = Ports.at(LivePortDex);
+    Jack->Value = 1.0;
+    Generation++;
   }
 };
 

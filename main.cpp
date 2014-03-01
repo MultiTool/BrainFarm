@@ -422,6 +422,7 @@ void PopSession() {
   Feed food;
   bugprintf("GenerateTestPorts()\n");
   food.GenerateTestPorts();
+  pop->Attach_Global_Feed(&food);
 
   Org *org;
   org = lug->tenant;
@@ -430,10 +431,11 @@ void PopSession() {
   bugprintf("Pop Init! %lu\n", pop->forestv.at(0));
   gettimeofday(&tm0, NULL);
   pop->Compile_Me();
+  pop->Gather_IoNodes_And_Connect(&food);
   for (gencnt=0; gencnt<NumGenerations; gencnt++) {
     int numnodes = pop->forestv[0]->tenant->NGene.size();
     bugprintf("Pop_Gen! %lu, %lf, numnodes:%li\n", gencnt, pop->forestv[0]->tenant->Score[0], numnodes);
-    pop->Gen();
+    pop->Gen();// running and testing happens here
     pop->Mutate(0.8, 0.8);
     if (gencnt % CleanPause == 0) {
       pop->Clean_Inventory();
@@ -469,12 +471,12 @@ void PopSession() {
 
 /* ********************************************************************** */
 int main() {
+  bugprintf("main()\n");
   srand(time(NULL));
+  PopSession(); return 0;
   Hilos hil;
   hil.ThreadTest2(); return 0;;
   ThreadTest(); return 0;;
-  bugprintf("main()\n");
-  PopSession(); return 0;
   maptest(); return 0;
   return 0;
 }

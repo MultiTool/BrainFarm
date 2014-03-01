@@ -20,6 +20,7 @@ public:
   std::vector<ScorePair> ScoreBuf;// for recording scores even after some creatures are dead
   uint32_t MaxNeuroGens = 2000;
   double SurvivalRate = 0.5;
+  FeedPtr GlobalFeed;
   /* ********************************************************************** */
   Pop() : Pop(popmax) {
   }
@@ -48,6 +49,10 @@ public:
     }
   }
   /* ********************************************************************** */
+  void Attach_Global_Feed(FeedPtr Food){
+    this->GlobalFeed = Food;
+  }
+  /* ********************************************************************** */
   void Fire_Cycle() {
     LugarPtr lugar;
     OrgPtr org;
@@ -68,6 +73,7 @@ public:
 
     if (true) {
       for (int fcnt=0; fcnt<10; fcnt++) {
+        this->GlobalFeed->NextGen();
         this->Fire_Cycle();
       }
     }
