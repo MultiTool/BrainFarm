@@ -64,6 +64,24 @@ public:
     }
   }
   /* ********************************************************************** */
+  void Clear_Scores() {
+    OrgPtr org;
+    size_t siz = this->ScoreDexv.size();
+    for (size_t cnt=0; cnt<siz; cnt++) {
+      org=this->ScoreDexv.at(cnt);
+      org->Clear_Score();
+    }
+  }
+  /* ********************************************************************** */
+  void Calculate_Scores() {
+    OrgPtr org;
+    size_t siz = this->ScoreDexv.size();
+    for (size_t cnt=0; cnt<siz; cnt++) {
+      org=this->ScoreDexv.at(cnt);
+      org->Calculate_Score();
+    }
+  }
+  /* ********************************************************************** */
   void Gen() { // new generation
     uint32_t popsize = this->forestv.size();
     LugarPtr lugar;
@@ -71,10 +89,13 @@ public:
     uint32_t pcnt;
     LugarPtr place;
 
+    Clear_Scores();
+
     if (true) {
       for (int fcnt=0; fcnt<10; fcnt++) {
         this->GlobalFeed->NextGen();
         this->Fire_Cycle();
+        this->Calculate_Scores();
       }
     }
     /*
@@ -150,12 +171,12 @@ public:
   /* ********************************************************************** */
   void Record_Scores() {
     size_t siz = ScoreDexv.size();
-    double *Score, *src;
+    double *Dest, *Src;
     for (int cnt=0; cnt<siz; cnt++) {
-      Score = ScoreBuf.at(cnt).Score;
-      src = ScoreDexv[cnt]->Score;
-      Score[0] = src[0];
-      Score[1] = src[1];
+      Src = ScoreDexv[cnt]->Score;
+      Dest = ScoreBuf.at(cnt).Score;
+      Dest[0] = Src[0];
+      Dest[1] = Src[1];
     }
   }
   /* ********************************************************************** */
@@ -164,9 +185,11 @@ public:
     size_t siz = ScoreDexv.size();
     size_t cnt;
     for (cnt=0; cnt<siz; cnt++) {
-      // ScoreDexv[cnt]->Print_Score();
       Score = ScoreBuf.at(cnt).Score;
-      bugprintf(" Score:%lf, %lf\n", Score[0], Score[1]);
+      bugprintf(" Score:%f, %f\n", Score[0], Score[1]);
+      if (Score[0]!=0.0){
+        bool nop = true;
+      }
     }
   }
   /* ********************************************************************** */

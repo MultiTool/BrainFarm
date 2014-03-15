@@ -64,7 +64,14 @@ public:
   /* ********************************************************************** */
   void Fire_Cycle() {
     NodePtr node;
-    size_t siz = this->NGene.size();
+    size_t siz;
+
+    siz = this->GlobalJackVec.size();
+    for (int ncnt=0; ncnt<siz; ncnt++) {
+      this->GlobalJackVec.at(ncnt)->UpwardValue = 0.0;
+    }
+
+    siz = this->NGene.size();
     for (int cnt=0; cnt<siz; cnt++) {
       node=this->NGene.at(cnt);
       node->Push_Fire();
@@ -125,8 +132,6 @@ public:
     NodePtr ndp, dupe;
     int KeepCnt=0;
     siz = this->NGene.size();
-
-    this->Uncompile_Me();
 
     {
       // first remove some
@@ -210,7 +215,7 @@ public:
       ndp = this->NGene.at(cnt);
       ndp->Compile_Me(NGenePtr);
     }
-    this->Gather_IoNodes();
+    //this->Gather_IoNodes();
   }
   /* ********************************************************************** */
   void Clear_Score() {
@@ -229,6 +234,22 @@ public:
     for (int cnt=0; cnt<NumScores; cnt++) {
       this->Score[cnt]*=Factor;
     }
+  }
+  /* ********************************************************************** */
+  void Calculate_Score() {
+    NodePtr node;
+    double Real, Guessed, SumScore;
+    IoJackPtr Jack;
+    size_t siz;
+    siz = this->GlobalJackVec.size();
+    SumScore = 0.0;
+    for (int ncnt=0; ncnt<siz; ncnt++) {
+      Jack = this->GlobalJackVec.at(ncnt);
+      Guessed = Jack->UpwardValue;
+      Real = Jack->GetValue();
+      SumScore += Guessed*Real;
+    }
+    this->Score[0] += SumScore;
   }
   /* ********************************************************************** */
   void Update_From_Feed() {
@@ -310,11 +331,11 @@ public:
             finddex = food->TreeSearchPorts(0, IoSpeciesId);
             if (finddex<portsiz && (GlobalJack=food->Ports.at(finddex))->PortId == IoSpeciesId) {
               LocalJack->UpStream = GlobalJack->AddRef();
+              GlobalJackVec.push_back(LocalJack);// WILL CAUSE MEMORY LEAK!!
             } else {
               LocalJack->Deprecated = true;
             }
           }
-          GlobalJackVec.push_back(LocalJack);// WILL CAUSE MEMORY LEAK!!
         }
         if (LocalJack->Deprecated) {
           ndp->MyType = IoType::Intra;// If not in master feed, we will never see it again as such. Mutate the node for all eternity.
@@ -435,13 +456,11 @@ public:
   /* ********************************************************************** */
   void Print_Me() {
     bugprintf("Org\n");
+    Print_Score();
     size_t siz = this->NGene.size();
     bugprintf("num nodes:%li\n", siz);
     for (int cnt=0; cnt<siz; cnt++) {
       NodePtr ndp = this->NGene.at(cnt);
-      if (ndp==NULL) {
-        bool nop = true;
-      }
       bugprintf(" Node addr:%p\n", ndp);
       ndp->Print_Me();
     }
@@ -456,7 +475,7 @@ public:
   }
   /* ********************************************************************** */
   void Print_Score() {
-    bugprintf(" Score:%lf, %lf\n", this->Score[0], this->Score[1]);
+    bugprintf(" Score:%f, %f\n", this->Score[0], this->Score[1]);
   }
   /* ********************************************************************** */
   int Compare_Score(OrgPtr other) {

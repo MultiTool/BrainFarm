@@ -12,10 +12,12 @@ public:
   IoDexType PortId;
   uint32_t refcnt;
   double Value;
+  double UpwardValue;
   bool Deprecated;
   IoJackBase() {
     this->refcnt=0;
     this->Value=0;
+    this->UpwardValue=0;
     this->Deprecated = false;
   }
   IoJackBasePtr AddRef() {
@@ -25,6 +27,9 @@ public:
   uint32_t UnRef(IoJackBasePtr *meref) {
     this->refcnt--;
     return this->refcnt;
+  }
+  virtual double GetValue(){
+    return 0.0;
   }
 //  IoJackBasePtr AddRef(IoJackBasePtr *meref){
 //    (*meref) = this;
@@ -49,6 +54,9 @@ public:
     this->Value=0;
     this->UpStream=NULL;
   }
+  double GetValue() override {
+    return this->UpStream->Value;
+  }
 };
 
 /* ********************************************************************** */
@@ -58,6 +66,9 @@ public:
   GlobalIoJack() {
     this->refcnt=0;
     this->Value=0;
+  }
+  double GetValue() override {
+    return 0.0;
   }
 };
 

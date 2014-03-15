@@ -51,7 +51,7 @@ public:
     child->Disuse = this->Disuse;
     return child;
   }
-  inline void Clear(){
+  inline void Clear() {
     this->FireVal=0.0;
     this->USNode=NULL; this->DSNode=NULL;
   }
@@ -70,7 +70,7 @@ public:
   void Print_Me() {
     bugprintf("  Link USID:%li, ", this->USID);
     bugprintf("USNode:%p, DSNode:%p ", this->USNode, this->DSNode);
-    bugprintf("Weight:%lf \n", this->Weight);
+    bugprintf("Weight:%f \n", this->Weight);
   }
 };
 typedef std::vector<LinkPtr> LinkVec;
@@ -88,26 +88,28 @@ public:
 
   LinkVec LGenome;
   LinkVec Working_Ins, Working_Outs;
-  double FireVal;
+  double PreFireVal, FireVal, NextFireVal;
   FireFunc SpecialFire;
   FireFunc2 SpecialFire2;
   /* ********************************************************************** */
-  void test(int ha){
+  void test(int ha) {
     //next;
   }
-  static void test2(NodePtr ha){
+  static void test2(NodePtr ha) {
   }
   /* ********************************************************************** */
   Node() {
     this->Jack = NULL;
+    this->PreFireVal = ((frand()*2.0)-1.0)*0.001;
     this->FireVal = ((frand()*2.0)-1.0)*0.001;
+    this->NextFireVal = ((frand()*2.0)-1.0)*0.001;
     this->SpecialFire = &Node::test;
     this->SpecialFire2 = test2;
     this->Working_Ins.clear();// probably not necessary
     this->Working_Outs.clear();
   }
   /* ********************************************************************** */
-  inline void testmore(){
+  inline void testmore() {
     (*this.*SpecialFire)(12);
     (this->*SpecialFire)(12);
 
@@ -128,9 +130,22 @@ public:
   static NodePtr Abiogenate() {
     NodePtr ndp = new Node();
     ndp->Jack = NULL;
-    ndp->MyType = IoType::Intra;
+    switch (rand()%2) {
+    case 0:
+      ndp->MyType = IoType::Intra;
+      break;
+    case 1:
+      ndp->MyType = IoType::GlobalIO;
+      ndp->IoSpeciesId = 'a' + rand()%('z'-'a');
+      break;
+    case 2:
+      ndp->MyType = IoType::NbrIO;
+      break;
+    }
     ndp->SpeciesId = IdMaker::MakeId();
-    // ndp->FireVal = ((frand()*2.0)-1.0)*0.001;
+    ndp->PreFireVal = ((frand()*2.0)-1.0)*0.001;
+    ndp->FireVal = ((frand()*2.0)-1.0)*0.001;
+    ndp->NextFireVal = ((frand()*2.0)-1.0)*0.001;
     return ndp;
   }
   /* ********************************************************************** */
@@ -142,6 +157,7 @@ public:
     child = new Node();
     child->MyType = this->MyType;
     child->SpeciesId = this->SpeciesId;
+    child->IoSpeciesId = this->IoSpeciesId;
     child->LGenome.resize(siz);
     for (size_t cnt=0; cnt<siz; cnt++) {
       lparent = this->LGenome.at(cnt);
@@ -153,23 +169,29 @@ public:
     }
     return child;
   }
+  const bool oldway = true;
   /* ********************************************************************** */
-  void Update_From_Feed() {
-    if (this->MyType == IoType::GlobalIO){
+  void Exchange_With_Feed() {
+    if (oldway) {
+      if (this->MyType == IoType::GlobalIO) {
+        this->Jack->UpwardValue += this->FireVal;
+        this->FireVal = this->Jack->Value;
+      }
+    } else {
+      if (this->MyType == IoType::GlobalIO) {
+        this->Jack->UpwardValue += this->NextFireVal;
+        this->FireVal = this->Jack->GetValue();
+      } else {
+        this->FireVal = this->NextFireVal;
+      }
     }
-    //this->FireVal = ActFun(Sum);
   }
   /* ********************************************************************** */
-  void Collect_And_Fire() {
-    LinkPtr ups;
-    double Sum=0;
-    size_t siz = this->Working_Ins.size();
-    for (int cnt=0; cnt<siz; cnt++) {
-      ups = this->Working_Ins.at(cnt);
-      Sum+=ups->GetFire();
+  void Update_From_Feed() {
+    if (this->MyType == IoType::GlobalIO) {
+      //this->Jack->Value += this->FireVal;
+      this->FireVal = this->Jack->Value;
     }
-    this->FireVal = ActFun(Sum);
-    //testmore();
   }
   /* ********************************************************************** */
   double ActFun(double xin) {
@@ -185,9 +207,33 @@ public:
     size_t siz = this->Working_Outs.size();
     for (int cnt=0; cnt<siz; cnt++) {
       downs = this->Working_Outs.at(cnt);
-      //printf("siz:%li, cnt:%li ", siz, cnt);
       downs->FireVal = MyFire;
     }
+  }
+  /* ********************************************************************** */
+  void Collect_And_Fire() {
+    LinkPtr ups;
+    double Sum=0;
+    size_t siz = this->Working_Ins.size();
+    for (int cnt=0; cnt<siz; cnt++) {
+      ups = this->Working_Ins.at(cnt);
+      Sum+=ups->GetFire();
+    }
+    size_t rawsiz = this->LGenome.size();
+    if (siz>0){
+      bool nop = true;
+    }
+    if (fabs(Sum)>Fudge){
+      bool nop = true;
+    }
+    if (oldway) {
+      this->FireVal = ActFun(Sum);
+    } else {
+      this->PreFireVal = ActFun(Sum);
+    }
+    Exchange_With_Feed();
+    //this->FireVal = this->NextFireVal;
+    //testmore();
   }
   /* ********************************************************************** */
   void Print_Me() {
@@ -347,6 +393,7 @@ public:
       int randint = rand()%3;
       // no waitaminute, this creates a net flow from majority types to minority types, favoring an equal proportion of all IO types even when selection didn't like that.
       this->MyType=static_cast<IoType::IoType>(randint);
+      this->IoSpeciesId = 'a' + rand()%('z'-'a');
       // but, if most nodes come from duplication, and type-mutation is very rare, then proportion will tend to be perserved.
     }
   }
@@ -401,36 +448,39 @@ public:
 
   */
 #endif
-/* ********************************************************************** */
+  /* ********************************************************************** */
   void Uncompile_Me() {
-    LinkPtr lns;
+    LinkPtr lnp;
     size_t cnt;
     size_t siz = this->LGenome.size();
     this->Working_Ins.clear();
     this->Working_Outs.clear();
     for (cnt=0; cnt<siz; cnt++) {
-      lns = this->LGenome.at(cnt);
-      lns->Clear();
+      lnp = this->LGenome.at(cnt);
+      lnp->Clear();
     }
   }
   /* ********************************************************************** */
   void Compile_Me(NodeVec *others) {
+    this->Uncompile_Me();
     size_t siz = this->LGenome.size();
     int NDex;
     UidType NbrId, NbrId_prev;
     NodePtr nbr;
-    LinkPtr lns;
+    LinkPtr lnp;
     NbrId_prev = 0;
     int cnt;
+    NDex = 0;
     for (cnt=0; cnt<siz; cnt++) {
-      lns = this->LGenome.at(cnt);
-      NbrId = lns->USID;
+      lnp = this->LGenome.at(cnt);
+      lnp->FireVal = 0.0;// snox, to catch a segfault
+      NbrId = lnp->USID;
       NbrId_prev=NbrId;
       NDex = TreeSearchNodeList(others, NDex, NbrId);// error, links may not be sorted here and they should be
       if (NDex < others->size() && ((nbr = others->at(NDex))->SpeciesId == NbrId) ) {
-        this->Attach_US(nbr, lns);
+        this->Attach_US(nbr, lnp);
       } else {
-        lns->USNode = NULL; lns->DSNode = NULL; lns->Disuse++;
+        lnp->USNode = NULL; lnp->DSNode = NULL; lnp->Disuse++;
       }
     }
     switch(this->MyType) {
@@ -443,10 +493,10 @@ public:
     }
   }
   /* ********************************************************************** */
-  void Attach_US(NodePtr other, LinkPtr ln) {// attach upstream node to me
-    this->Working_Ins.push_back(ln);// this approach uses less memory, fewer allocations/frees and is probably faster.
-    other->Working_Outs.push_back(ln);
-    ln->USNode = other; ln->DSNode = this;
+  void Attach_US(NodePtr other, LinkPtr lnp) {// attach upstream node to me
+    this->Working_Ins.push_back(lnp);// this approach uses less memory, fewer allocations/frees and is probably faster.
+    other->Working_Outs.push_back(lnp);
+    lnp->USNode = other; lnp->DSNode = this;
   }
   /* ********************************************************************** */
   int mainX () {

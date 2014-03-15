@@ -67,7 +67,7 @@ void TimeTest() {
 
   gettimeofday(&tm1, NULL);
 
-  bugprintf("sum:%lf \n", sum);
+  bugprintf("sum:%f \n", sum);
 
   bugprintf("tm0:%ld:%ld\n", tm0.tv_sec, tm0.tv_usec);
   bugprintf("tm1:%ld:%ld\n", tm1.tv_sec, tm1.tv_usec);
@@ -144,7 +144,7 @@ void maptest() {
     bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("delta:%f\n", tf1-tf0);
     bugprintf("\n");
   }
   if (true) {
@@ -160,7 +160,7 @@ void maptest() {
     bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("delta:%f\n", tf1-tf0);
     bugprintf("\n");
   }
   if (true) {
@@ -174,7 +174,7 @@ void maptest() {
     bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("delta:%f\n", tf1-tf0);
     bugprintf("\n");
   }
   if (false) {
@@ -190,7 +190,7 @@ void maptest() {
     bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("delta:%f\n", tf1-tf0);
     bugprintf("\n");
   }
   if (true) {
@@ -217,7 +217,7 @@ void maptest() {
     bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("delta:%f\n", tf1-tf0);
     bugprintf("\n");
   }
   //bugprintf("flexray skip 13.\n");
@@ -255,7 +255,7 @@ void maptest() {
     bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("delta:%f\n", tf1-tf0);
     bugprintf("\n");
   }
   if (true) {
@@ -298,7 +298,7 @@ void maptest() {
     bugprintf("tm1:%ld.%ld\n", tm1.tv_sec, tm1.tv_usec);
     tf0 = tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
     tf1 = tm1.tv_sec + ((double)tm1.tv_usec)/uprecision;
-    bugprintf("delta:%lf\n", tf1-tf0);
+    bugprintf("delta:%f\n", tf1-tf0);
     bugprintf("\n");
   }
   if (newleaf!=NULL) freesafe(newleaf);
@@ -406,36 +406,32 @@ void PopSession() {
   OrgPtr org0;
   uint32_t gencnt;
   // 3.129000 seconds for a pop of 100, for 100 generations
-  bugprintf("PopSession()\n");
+  printf("PopSession()\n");
   int NumGenerations = 100;
   int CleanPause = 1;//16
   //int NumGenerations = 1000000;// for about 10 hours
   int MaxSize=0, SumSize = 0, AvgSize=0;
 
-  bugprintf("Pop_Create!\n");
+  printf("Pop_Create!\n");
   pop = new Pop();
-  bugprintf("Pop Init! %lu\n", pop->forestv.size());
-  LugarPtr lug;
-  lug = pop->forestv.at(0);
-  bugprintf("lug %lu\n", lug);
+  printf("Pop Init! %li\n", pop->forestv.size());
 
   Feed food;
-  bugprintf("GenerateTestPorts()\n");
+  printf("GenerateTestPorts()\n");
   food.GenerateTestPorts();
   pop->Attach_Global_Feed(&food);
 
-  Org *org;
-  org = lug->tenant;
-  bugprintf("org %lu\n", org);
-
-  bugprintf("Pop Init! %lu\n", pop->forestv.at(0));
   gettimeofday(&tm0, NULL);
   pop->Compile_Me();
   pop->Gather_IoNodes_And_Connect(&food);
   for (gencnt=0; gencnt<NumGenerations; gencnt++) {
-    int numnodes = pop->forestv[0]->tenant->NGene.size();
-    bugprintf("Pop_Gen! %lu, %lf, numnodes:%li\n", gencnt, pop->forestv[0]->tenant->Score[0], numnodes);
     pop->Gen();// running and testing happens here
+
+    org0 = pop->ScoreDexv[0];//org0 = pop->forestv[0]->tenant;
+    int numnodes = org0->NGene.size();
+    double score = org0->Score[0];
+    printf("Pop_Gen! %li, %f, numnodes:%li\n", gencnt, score, numnodes);//
+
     pop->Mutate(0.8, 0.8);
     if (gencnt % CleanPause == 0) {
       pop->Clean_Inventory();
@@ -453,25 +449,27 @@ void PopSession() {
   gettimeofday(&tm1, NULL);
 
   {
+    pop->Print_Sorted_Scores();
+    org0 = pop->ScoreDexv.at(pop->ScoreDexv.size()-1);
     org0 = pop->forestv[0]->tenant;
     bugprintf("Org 0, gen:%li, ", NumGenerations-1);
     org0->Print_Me();
     bugprintf("Org 0, gen:%li, ", NumGenerations-1);
     AvgSize = SumSize/(double)NumGenerations;
-    bugprintf("size:%li, MaxSize:%li, AvgSize:%lf\n", org0->NGene.size(), MaxSize, AvgSize);
+    bugprintf("size:%li, MaxSize:%li, AvgSize:%f\n", org0->NGene.size(), MaxSize, AvgSize);
   }
 
   double t0 = FullTime(tm0);
   double t1 = FullTime(tm1);
   double delta = t1-t0;
-  bugprintf("delta T:%lf\n", delta);
-  bugprintf("Pop_Delete! %lf\n", pop->forestv[0]->tenant->Score[0]);
+  bugprintf("delta T:%f\n", delta);
+  bugprintf("Pop_Delete! %f\n", pop->forestv[0]->tenant->Score[0]);
   delete pop;
 }
 
 /* ********************************************************************** */
 int main() {
-  bugprintf("main()\n");
+  printf("main()\n");
   srand(time(NULL));
   PopSession(); return 0;
   Hilos hil;
