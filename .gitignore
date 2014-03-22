@@ -22,4 +22,4 @@ bin/
 *.cbTemp
 
 # Core dumps
-*.out
+*.out 
