@@ -31,7 +31,6 @@ class Org {
 public:
   const static int NumScores = 2;
   double Score[NumScores];
-  //double Score;
   struct Lugar *home;// my location
   NodeVec NGene;
   NodeVec *NGenePtr;
@@ -238,18 +237,21 @@ public:
   /* ********************************************************************** */
   void Calculate_Score() {
     NodePtr node;
-    double Real, Guessed, SumScore;
+    double Real, Guessed, Temp, SumScore0, SumScore1;
     IoJackPtr Jack;
     size_t siz;
     siz = this->GlobalJackVec.size();
-    SumScore = 0.0;
+    SumScore0 = 0.0; SumScore1 = 0.0;
     for (int ncnt=0; ncnt<siz; ncnt++) {
       Jack = this->GlobalJackVec.at(ncnt);
       Guessed = Jack->UpwardValue;
       Real = Jack->GetValue();
-      SumScore += Guessed*Real;
+      Temp = math_sgn(Guessed)*math_sgn(Real);
+      SumScore0 += Temp;
+      SumScore1 += Guessed*Real;
     }
-    this->Score[0] += SumScore;
+    this->Score[0] += SumScore0;
+    this->Score[1] += SumScore1;
   }
   /* ********************************************************************** */
   void Update_From_Feed() {

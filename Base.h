@@ -61,6 +61,7 @@ using namespace __gnu_cxx;
 
 #define allocsafe(T, num) (T*)malloc(sizeof(T)*num)
 #define freesafe(obj) free(obj)
+#define math_sgn(num) ((num>0)?1:((num<0)?-1:0))
 
 typedef uint64_t UidType;
 typedef std::vector<UidType> UidVec;

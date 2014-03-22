@@ -429,8 +429,10 @@ void PopSession() {
 
     org0 = pop->ScoreDexv[0];//org0 = pop->forestv[0]->tenant;
     int numnodes = org0->NGene.size();
-    double score = org0->Score[0];
-    printf("Pop_Gen! %li, %f, numnodes:%li\n", gencnt, score, numnodes);//
+    double score0 = org0->Score[0];
+    double score1 = org0->Score[1];
+    int NumJacks = org0->GlobalJackVec.size();
+    printf("Pop_Gen! %li, %f, %f, numnodes:%li, NumJacks:%li\n", gencnt, score0, score1, numnodes, NumJacks);
 
     pop->Mutate(0.8, 0.8);
     if (gencnt % CleanPause == 0) {
@@ -452,8 +454,10 @@ void PopSession() {
     pop->Print_Sorted_Scores();
     org0 = pop->ScoreDexv.at(pop->ScoreDexv.size()-1);
     org0 = pop->forestv[0]->tenant;
-    bugprintf("Org 0, gen:%li, ", NumGenerations-1);
-    org0->Print_Me();
+    if (false){
+      bugprintf("Org 0, gen:%li, ", NumGenerations-1);
+      org0->Print_Me();
+    }
     bugprintf("Org 0, gen:%li, ", NumGenerations-1);
     AvgSize = SumSize/(double)NumGenerations;
     bugprintf("size:%li, MaxSize:%li, AvgSize:%f\n", org0->NGene.size(), MaxSize, AvgSize);
