@@ -49,7 +49,7 @@ public:
     GlobalIoJackPtr jack;
     char ch;
     ch = 'a';
-    while (ch<='z') {
+    while (ch<=zee) {
       jack = new GlobalIoJack(); this->Ports.push_back(jack);
       jack->PortId = ch;
       ch++;

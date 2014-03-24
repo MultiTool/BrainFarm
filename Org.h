@@ -237,7 +237,7 @@ public:
   /* ********************************************************************** */
   void Calculate_Score() {
     NodePtr node;
-    double Real, Guessed, Temp, SumScore0, SumScore1;
+    double Real, Guessed, Temp0, Temp1, SumScore0, SumScore1;
     IoJackPtr Jack;
     size_t siz;
     siz = this->GlobalJackVec.size();
@@ -246,12 +246,17 @@ public:
       Jack = this->GlobalJackVec.at(ncnt);
       Guessed = Jack->UpwardValue;
       Real = Jack->GetValue();
-      Temp = math_sgn(Guessed)*math_sgn(Real);
-      SumScore0 += Temp;
-      SumScore1 += Guessed*Real;
+      Temp0 = math_sgn(Guessed)*math_sgn(Real);
+      Temp1 = Guessed*Real;
+      if (fabs(Temp1)<Fudge){
+        bool nop = true;
+      }
+      SumScore0 += Temp0;
+      SumScore1 += Temp1;
     }
     this->Score[0] += SumScore0;
     this->Score[1] += SumScore1;
+    bool nop = true;
   }
   /* ********************************************************************** */
   void Update_From_Feed() {
@@ -308,6 +313,17 @@ public:
     if(jack->Deprecated) { delete jack; }
   }
   /* ********************************************************************** */
+  void Clear_IoNodes() {
+    GlobalIoJackPtr GlobalJack;
+    IoJackPtr LocalJack;
+    size_t siz = this->GlobalJackVec.size();
+    for (int cnt=0; cnt<siz; cnt++) {
+      LocalJack = this->GlobalJackVec.at(cnt);
+      delete LocalJack;
+    }
+    this->GlobalJackVec.clear();
+  }
+  /* ********************************************************************** */
   void Gather_IoNodes_And_Connect(FeedPtr food) {
     FR::Flexray<IoJack> fray;// merge with Connect_Jacks
     size_t portsiz = food->size();
@@ -316,6 +332,7 @@ public:
     GlobalIoJackPtr GlobalJack;
     uint32_t finddex;
     NodePtr ndp;
+    Clear_IoNodes();
     size_t siz = this->NGene.size();
     for (int cnt=0; cnt<siz; cnt++) {
       ndp = this->NGene.at(cnt);// for every node

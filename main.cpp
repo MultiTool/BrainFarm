@@ -407,7 +407,8 @@ void PopSession() {
   uint32_t gencnt;
   // 3.129000 seconds for a pop of 100, for 100 generations
   printf("PopSession()\n");
-  int NumGenerations = 100;
+  //int NumGenerations = 100;
+  int NumGenerations = 500;
   int CleanPause = 1;//16
   //int NumGenerations = 1000000;// for about 10 hours
   int MaxSize=0, SumSize = 0, AvgSize=0;

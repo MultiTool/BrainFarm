@@ -63,6 +63,7 @@ public:
 typedef class GlobalIoJack *GlobalIoJackPtr;
 class GlobalIoJack : public IoJackBase {
 public:
+  std::vector<double> JackHistory;
   GlobalIoJack() {
     this->refcnt=0;
     this->Value=0;

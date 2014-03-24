@@ -88,9 +88,10 @@ public:
 
   LinkVec LGenome;
   LinkVec Working_Ins, Working_Outs;
-  double PreFireVal, FireVal, NextFireVal;
+  double FireVal, NextFireVal;
   FireFunc SpecialFire;
   FireFunc2 SpecialFire2;
+  std::vector<double> FireHistory;
   /* ********************************************************************** */
   void test(int ha) {
     //next;
@@ -100,13 +101,13 @@ public:
   /* ********************************************************************** */
   Node() {
     this->Jack = NULL;
-    this->PreFireVal = ((frand()*2.0)-1.0)*0.001;
     this->FireVal = ((frand()*2.0)-1.0)*0.001;
     this->NextFireVal = ((frand()*2.0)-1.0)*0.001;
     this->SpecialFire = &Node::test;
     this->SpecialFire2 = test2;
     this->Working_Ins.clear();// probably not necessary
     this->Working_Outs.clear();
+    this->FireHistory.clear();
   }
   /* ********************************************************************** */
   inline void testmore() {
@@ -120,7 +121,7 @@ public:
     size_t cnt;
     this->Working_Ins.clear();// probably not necessary
     this->Working_Outs.clear();
-
+    this->FireHistory.clear();
     for (cnt=0; cnt<this->LGenome.size(); cnt++) {
       delete this->LGenome.at(cnt);
     }
@@ -136,14 +137,13 @@ public:
       break;
     case 1:
       ndp->MyType = IoType::GlobalIO;
-      ndp->IoSpeciesId = 'a' + rand()%('z'-'a');
+      ndp->IoSpeciesId = 'a' + rand()%(1+zee-'a');
       break;
     case 2:
       ndp->MyType = IoType::NbrIO;
       break;
     }
     ndp->SpeciesId = IdMaker::MakeId();
-    ndp->PreFireVal = ((frand()*2.0)-1.0)*0.001;
     ndp->FireVal = ((frand()*2.0)-1.0)*0.001;
     ndp->NextFireVal = ((frand()*2.0)-1.0)*0.001;
     return ndp;
@@ -229,7 +229,7 @@ public:
     if (oldway) {
       this->FireVal = ActFun(Sum);
     } else {
-      this->PreFireVal = ActFun(Sum);
+      this->NextFireVal = ActFun(Sum);
     }
     Exchange_With_Feed();
     //this->FireVal = this->NextFireVal;
@@ -393,7 +393,7 @@ public:
       int randint = rand()%3;
       // no waitaminute, this creates a net flow from majority types to minority types, favoring an equal proportion of all IO types even when selection didn't like that.
       this->MyType=static_cast<IoType::IoType>(randint);
-      this->IoSpeciesId = 'a' + rand()%('z'-'a');
+      this->IoSpeciesId = 'a' + rand()%(1+zee-'a');
       // but, if most nodes come from duplication, and type-mutation is very rare, then proportion will tend to be perserved.
     }
   }
