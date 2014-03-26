@@ -63,9 +63,9 @@ using namespace __gnu_cxx;
 #define freesafe(obj) free(obj)
 #define math_sgn(num) ((num>0)?1:((num<0)?-1:0))
 
-#define zee 'z'
+//#define zee 'z'
 //#define zee 'b'
-//#define zee 'c'
+#define zee 'c'
 
 typedef uint64_t UidType;
 typedef std::vector<UidType> UidVec;

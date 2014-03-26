@@ -50,9 +50,7 @@ public:
       ndp = this->NGene.at(ncnt);
       delete ndp;
     }
-    for (int ncnt=0; ncnt<this->GlobalJackVec.size(); ncnt++) {
-      delete this->GlobalJackVec.at(ncnt);
-    }
+    Clear_IoNodes();
   }
   /* ********************************************************************** */
   static OrgPtr Abiogenate() {
@@ -314,12 +312,9 @@ public:
   }
   /* ********************************************************************** */
   void Clear_IoNodes() {
-    GlobalIoJackPtr GlobalJack;
-    IoJackPtr LocalJack;
     size_t siz = this->GlobalJackVec.size();
     for (int cnt=0; cnt<siz; cnt++) {
-      LocalJack = this->GlobalJackVec.at(cnt);
-      delete LocalJack;
+      delete this->GlobalJackVec.at(cnt);
     }
     this->GlobalJackVec.clear();
   }

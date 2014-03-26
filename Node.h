@@ -169,23 +169,6 @@ public:
     }
     return child;
   }
-  const bool oldway = false;
-  /* ********************************************************************** */
-  void Exchange_With_Feed() {
-    if (oldway) {
-      if (this->MyType == IoType::GlobalIO) {
-        this->Jack->UpwardValue += this->FireVal;
-        this->FireVal = this->Jack->Value;
-      }
-    } else {
-      if (this->MyType == IoType::GlobalIO) {
-        this->Jack->UpwardValue += this->NextFireVal;
-        this->FireVal = this->Jack->GetValue();
-      } else {
-        this->FireVal = this->NextFireVal;
-      }
-    }
-  }
   /* ********************************************************************** */
   void Update_From_Feed() {
     if (this->MyType == IoType::GlobalIO) {
@@ -219,33 +202,17 @@ public:
       ups = this->Working_Ins.at(cnt);
       Sum+=ups->GetFire();
     }
-    size_t rawsiz = this->LGenome.size();
-    if (siz>0){
-      bool nop = true;
-    }
-    if (fabs(Sum)>Fudge){
-      bool nop = true;
-    }
-    if (oldway) {
-      this->FireVal = ActFun(Sum);
-    } else {
-      this->NextFireVal = ActFun(Sum);
-    }
+    this->NextFireVal = ActFun(Sum);
     Exchange_With_Feed();
-    //this->FireVal = this->NextFireVal;
     //testmore();
   }
   /* ********************************************************************** */
-  void Print_Me() {
-    //const void *address = static_cast<const void*>(this);
-    //void *address = (this);
-    void *address = &SpeciesId;
-    bugprintf(" Node SpeciesId:%li, MyType:%li, this:%p\n", this->SpeciesId, this->MyType, address);
-    size_t siz = this->LGenome.size();
-    bugprintf(" numlinks:%li\n", siz);
-    for (int cnt=0; cnt<siz; cnt++) {
-      LinkPtr lnk = this->LGenome.at(cnt);
-      lnk->Print_Me();
+  void Exchange_With_Feed() {
+    if (this->MyType == IoType::GlobalIO) {
+      this->Jack->UpwardValue += this->NextFireVal;
+      this->FireVal = this->Jack->GetValue();
+    } else {
+      this->FireVal = this->NextFireVal;
     }
   }
   /* ********************************************************************** */
@@ -411,43 +378,6 @@ public:
     }
     std::sort (this->LGenome.begin(), this->LGenome.end(), AscendingLinkUid);
   }
-#if false
-  /*
-  mutation:
-  can just mess with weights and node IDs.
-  but, also need to add or remove connections.
-  might be easiest to just create a second genome and copy it over. that may mean genome is a *link* to a genome vect.
-  or, mutation can happen in the event where the parent makes the child.  no post-natal mutation.  is postnat mutation easier?
-  but, mating must occur during spawning anyway, not afterward.
-
-  std::random_shuffle ( NGene.begin(), NGene.end() );// shuffle to randomize which duplicates are deleted
-  std::sort (NGene.begin(), NGene.end(), AscendingLinkUid);
-
-  sort links
-  for compile,
-  sort links
-  uint64_t startplace=0;
-  for each link {
-  startplace = TreeSearchLinkList(LinkVec *NList, startplace, UidType target) for right node, if found connect
-  }
-
-  for mutate,
-  for each link {// remove
-  maybe delete, pack in situ.
-  }
-  for each node {// add
-  maybe add link {
-    get node id
-    create link with that id and random weight
-    since nodes are sorted, this can be done as just a merge. in situ shifting is easy.
-  }
-  }
-  for each link {
-  maybe change weight
-  }
-
-  */
-#endif
   /* ********************************************************************** */
   void Uncompile_Me() {
     LinkPtr lnp;
@@ -558,7 +488,19 @@ public:
     }
     return LoDex;
   }
-
+  /* ********************************************************************** */
+  void Print_Me() {
+    //const void *address = static_cast<const void*>(this);
+    //void *address = (this);
+    void *address = &SpeciesId;
+    bugprintf(" Node SpeciesId:%li, MyType:%li, this:%p\n", this->SpeciesId, this->MyType, address);
+    size_t siz = this->LGenome.size();
+    bugprintf(" numlinks:%li\n", siz);
+    for (int cnt=0; cnt<siz; cnt++) {
+      LinkPtr lnk = this->LGenome.at(cnt);
+      lnk->Print_Me();
+    }
+  }
 };
 
 #endif // NODE_H_INCLUDED

@@ -4,8 +4,8 @@
 #include "Org.h"
 #include "Lugar.h"
 
-//#define popmax 1000
-#define popmax 100
+#define popmax 1000
+//#define popmax 100
 
 
 /* ********************************************************************** */
@@ -186,7 +186,7 @@ public:
     size_t cnt;
     for (cnt=0; cnt<siz; cnt++) {
       Score = ScoreBuf.at(cnt).Score;
-      bugprintf(" Score:%f, %f\n", Score[0], Score[1]);
+      bugprintf(" %03li, Score:%f, %f\n", cnt, Score[0], Score[1]);
       if (Score[0]!=0.0){
         bool nop = true;
       }
