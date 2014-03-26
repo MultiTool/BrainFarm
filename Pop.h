@@ -49,7 +49,7 @@ public:
     }
   }
   /* ********************************************************************** */
-  void Attach_Global_Feed(FeedPtr Food){
+  void Attach_Global_Feed(FeedPtr Food) {
     this->GlobalFeed = Food;
   }
   /* ********************************************************************** */
@@ -84,6 +84,8 @@ public:
   /* ********************************************************************** */
   void Gen() { // new generation
     uint32_t popsize = this->forestv.size();
+    //int Fire_Test_Cycles = 100;
+    int Fire_Test_Cycles = 10;
     LugarPtr lugar;
     Org *parent, *child;
     uint32_t pcnt;
@@ -91,13 +93,12 @@ public:
 
     Clear_Scores();
 
-    if (true) {
-      for (int fcnt=0; fcnt<10; fcnt++) {
-        this->GlobalFeed->NextGen();
-        this->Fire_Cycle();
-        this->Calculate_Scores();
-      }
+    for (int fcnt=0; fcnt<Fire_Test_Cycles; fcnt++) {
+      this->GlobalFeed->NextGen();
+      this->Fire_Cycle();
+      this->Calculate_Scores();
     }
+
     /*
     place holder
     first we need to score and sort the parents, then we create children
@@ -187,7 +188,7 @@ public:
     for (cnt=0; cnt<siz; cnt++) {
       Score = ScoreBuf.at(cnt).Score;
       bugprintf(" %03li, Score:%f, %f\n", cnt, Score[0], Score[1]);
-      if (Score[0]!=0.0){
+      if (Score[0]!=0.0) {
         bool nop = true;
       }
     }

@@ -407,9 +407,9 @@ void PopSession() {
   uint32_t gencnt;
   // 3.129000 seconds for a pop of 100, for 100 generations
   printf("PopSession()\n");
-  int NumGenerations = 100;
+  //int NumGenerations = 100;
   //int NumGenerations = 1000;
-  //int NumGenerations = 500;
+  int NumGenerations = 500;
   //int NumGenerations = 50;
   int CleanPause = 1;//16
   //int NumGenerations = 1000000;// for about 10 hours
@@ -435,9 +435,11 @@ void PopSession() {
     double score0 = org0->Score[0];
     double score1 = org0->Score[1];
     int NumJacks = org0->GlobalJackVec.size();
-    printf("Pop_Gen! %li, %f, %f, numnodes:%li, NumJacks:%li\n", gencnt, score0, score1, numnodes, NumJacks);
+    printf("Pop_Gen! %04li, %f, %f, numnodes:%li, NumJacks:%li\n", gencnt, score0, score1, numnodes, NumJacks);
 
-    pop->Mutate(0.8, 0.8);
+    if (NumGenerations-gencnt > 20){// stop mutating for 20 generations in the final stretch
+      pop->Mutate(0.8, 0.8);
+    }
     if (gencnt % CleanPause == 0) {
       pop->Clean_Inventory();
     }
