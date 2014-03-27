@@ -14,6 +14,7 @@
 
 #define WeightAmp 2.0;
 
+const uint16_t Num_IoTypes = 3;
 namespace IoType {
   enum IoType {Intra=0, GlobalIO=1, NbrIO=2};
 }
@@ -22,6 +23,7 @@ const int DisuseThresh = 1;
 //static UidType UidSource;
 
 //enum class IoType : uint8_t {Intra, Output};// will be valid in future C++11
+enum class IoType2 : uint8_t {Intra=0, GlobalIO=1, NbrIO=2};// will be valid in future C++11
 /* ********************************************************************** */
 class Node;
 typedef Node *NodePtr;
@@ -357,7 +359,7 @@ public:
     }
     rnum = frand();
     if (rnum < rejackquota) {
-      int randint = rand()%3;
+      int randint = rand()%Num_IoTypes;
       // no waitaminute, this creates a net flow from majority types to minority types, favoring an equal proportion of all IO types even when selection didn't like that.
       this->MyType=static_cast<IoType::IoType>(randint);
       this->IoSpeciesId = 'a' + rand()%(1+zee-'a');

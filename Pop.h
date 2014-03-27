@@ -84,8 +84,9 @@ public:
   /* ********************************************************************** */
   void Gen() { // new generation
     uint32_t popsize = this->forestv.size();
-    //int Fire_Test_Cycles = 100;
-    int Fire_Test_Cycles = 10;
+    int Fire_Test_Cycles = 100;
+    //int Fire_Test_Cycles = 10;
+    //MaxNeuroGens
     LugarPtr lugar;
     Org *parent, *child;
     uint32_t pcnt;

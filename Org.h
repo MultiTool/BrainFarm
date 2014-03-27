@@ -468,23 +468,35 @@ public:
     }
   }
   /* ********************************************************************** */
-  void Print_Me() {
-    bugprintf("Org\n");
-    Print_Score();
-    size_t siz = this->NGene.size();
-    bugprintf("num nodes:%li\n", siz);
-    for (int cnt=0; cnt<siz; cnt++) {
-      NodePtr ndp = this->NGene.at(cnt);
-      bugprintf(" Node addr:%p\n", ndp);
-      ndp->Print_Me();
-    }
-  }
-  /* ********************************************************************** */
   void Inventory(UidVec *uvec) {
     size_t siz = this->NGene.size();
     for (int cnt=0; cnt<siz; cnt++) {
       NodePtr ndp = this->NGene.at(cnt);
       uvec->push_back(ndp->SpeciesId);
+    }
+  }
+  /* ********************************************************************** */
+  void Print_Me() {
+    NodePtr ndp;
+    bugprintf("Org\n");
+    Print_Score();
+    size_t siz = this->NGene.size();
+    bugprintf("num nodes:%li\n", siz);
+    for (int cnt=0; cnt<siz; cnt++) {
+      ndp = this->NGene.at(cnt);
+      bugprintf(" Node addr:%p\n", ndp);
+      ndp->Print_Me();
+    }
+  }
+  /* ********************************************************************** */
+  void Print_Jacks() {
+    IoJackPtr jckp;
+    char ch;
+    size_t siz = this->GlobalJackVec.size();
+    for (int cnt=0; cnt<siz; cnt++) {
+      jckp = this->GlobalJackVec.at(cnt);
+      ch = jckp->PortId;
+      bugprintf("%c, ", ch);
     }
   }
   /* ********************************************************************** */
