@@ -49,7 +49,6 @@
 		<Unit filename="Node.h" />
 		<Unit filename="Org.h" />
 		<Unit filename="Pop.h" />
-		<Unit filename="WebMain.cpp" />
 		<Unit filename="flexray.c">
 			<Option compilerVar="CC" />
 		</Unit>

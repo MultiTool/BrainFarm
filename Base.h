@@ -23,6 +23,15 @@
 #include <stdarg.h>
 #include <cstdarg>
 
+#include <thread> // std::thread
+#include <atomic> // std::atomic
+#include <unistd.h>
+
+#include <fstream>
+#include <sstream>
+
+using namespace std;
+
 using namespace __gnu_cxx;
 
 #ifndef false
@@ -134,6 +143,54 @@ static void Distribution() {
     // inprob here is probability that cellnum cell is filled.
     // System.Console.WriteLine("cellnum:{0}, raysublen:{1}, inprob:{2}", cellnum, raysublen, inprob);
   }
+}
+/* ********************************************************************** */
+const double uprecision = 1000000.0;
+inline double FullTime(struct timeval tm0) {// returns time in seconds and fractions of seconds
+  return tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
+}
+/* ********************************************************************** */
+void DelayUntil(int hour) {
+  struct timeval tim1;
+  struct tm *tmutc;
+  do { //libcurl.dll.a
+    gettimeofday(&tim1, NULL);
+    tmutc = gmtime(&tim1.tv_sec);
+    usleep(30*1000000L);// thirty seconds
+    printf("time:%02d:%02d:%02d\n", tmutc->tm_hour, tmutc->tm_min, tmutc->tm_sec);
+  } while (tmutc->tm_hour<hour);
+}
+
+/* ********************************************************************** */
+std::vector<std::string> &split2(const std::string &s, char delim, std::vector<std::string> &elems, int MaxDelimeters) {
+  std::stringstream sstream(s);// http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c
+  std::string item;
+  int cnt = 0;
+  while (std::getline(sstream, item, delim)) {
+    elems.push_back(item);
+    if (++cnt>=MaxDelimeters) {break;}
+  }
+  if(std::getline(sstream, item)) { elems.push_back(item); }// append the leftovers
+  return elems;
+}
+std::vector<std::string> split2(const std::string &s, char delim, int MaxDelimeters) {
+  std::vector<std::string> elems;//http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c
+  split2(s, delim, elems, MaxDelimeters);
+  return elems;
+}
+/* ********************************************************************** */
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+  std::stringstream ss(s);// http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    elems.push_back(item);
+  }
+  return elems;
+}
+std::vector<std::string> split(const std::string &s, char delim) {
+  std::vector<std::string> elems;//http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c
+  split(s, delim, elems);
+  return elems;
 }
 
 #if false

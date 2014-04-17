@@ -29,6 +29,7 @@ HOWEVER, we cannot dispose of the master feed through refcounting. could have de
 #include "Pop.h"
 #include "flexray.h"
 #include "FlexrayC.h"
+#include "Feeder.h"
 
 using namespace std;
 using namespace __gnu_cxx;
@@ -94,12 +95,6 @@ void sorttest() {
     bugprintf("SpeciesId not found.\n");
   }
 }
-
-const double uprecision = 1000000.0;
-double FullTime(struct timeval tm0) {// returns time in seconds and fractions of seconds
-  return tm0.tv_sec + ((double)tm0.tv_usec)/uprecision;
-}
-
 #define testsize 1000
 //uint32 ramcnt=0,leaframcnt=0;
 void flexray_leaf_free(void *leaf)
@@ -440,7 +435,7 @@ void PopSession() {
     org0->Print_Jacks();
     printf("\n");
 
-    if (NumGenerations-gencnt > 20){// stop mutating for 20 generations in the final stretch
+    if (NumGenerations-gencnt > 20) { // stop mutating for 20 generations in the final stretch
       pop->Mutate(0.8, 0.8);
     }
     if (gencnt % CleanPause == 0) {
@@ -462,7 +457,7 @@ void PopSession() {
     pop->Print_Sorted_Scores();
     org0 = pop->ScoreDexv.at(pop->ScoreDexv.size()-1);
     org0 = pop->forestv[0]->tenant;
-    if (false){
+    if (false) {
       bugprintf("Org 0, gen:%li, ", NumGenerations-1);
       org0->Print_Me();
     }
@@ -478,9 +473,23 @@ void PopSession() {
   bugprintf("Pop_Delete! %f\n", pop->forestv[0]->tenant->Score[0]);
   delete pop;
 }
-
+/* ********************************************************************** */
+void FileFeedTest() {
+  std::string glob = "abcdefghijklmnop";
+  FileFeeder feed;
+  feed.Open();
+  for (int cnt=0; cnt<6; cnt++) {
+    feed.Fetch(glob);
+    cout << "glob is:[" << glob << "]";
+    printf("\n");
+    //ParseGlob(glob);
+  }
+  feed.Close();
+}
 /* ********************************************************************** */
 int main() {
+  FileFeedTest(); return 0;
+  usleep(30*1000000L);// thirty seconds
   printf("main()\n");
   srand(time(NULL));
   PopSession(); return 0;
