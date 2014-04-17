@@ -37,14 +37,19 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add library="curl" />
+		</Linker>
 		<Unit filename="Base.h" />
 		<Unit filename="Feed.h" />
+		<Unit filename="Feeder.h" />
 		<Unit filename="FlexrayC.h" />
 		<Unit filename="IoJack.h" />
 		<Unit filename="Lugar.h" />
 		<Unit filename="Node.h" />
 		<Unit filename="Org.h" />
 		<Unit filename="Pop.h" />
+		<Unit filename="WebMain.cpp" />
 		<Unit filename="flexray.c">
 			<Option compilerVar="CC" />
 		</Unit>
