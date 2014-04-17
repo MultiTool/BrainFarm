@@ -129,9 +129,9 @@ public:
     tmutc = gmtime(&tim1.tv_sec);
 
     const char *txt = readBuffer.c_str();
-    printf("<cut>%06i; %02d:%02d:%02d; %20.3f</cut>\n", FetchCnt, tmlocal->tm_hour, tmlocal->tm_min, tmlocal->tm_sec, timnum1);
-    printf("%s", txt);
-
+    //printf("<cut>%06i; %02d:%02d:%02d; %20.3f</cut>\n", FetchCnt, tmlocal->tm_hour, tmlocal->tm_min, tmlocal->tm_sec, timnum1);
+    //printf("%s", txt);
+    glob = readBuffer;
     FetchCnt++;
   }
   /* ********************************************************************** */

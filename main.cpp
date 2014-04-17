@@ -474,9 +474,10 @@ void PopSession() {
   delete pop;
 }
 /* ********************************************************************** */
-void FileFeedTest() {
+void FeedTest() {
   std::string glob = "abcdefghijklmnop";
-  FileFeeder feed;
+  //FileFeeder feed;
+  WebFeeder feed;
   feed.Open();
   for (int cnt=0; cnt<6; cnt++) {
     feed.Fetch(glob);
@@ -488,7 +489,7 @@ void FileFeedTest() {
 }
 /* ********************************************************************** */
 int main() {
-  FileFeedTest(); return 0;
+  FeedTest(); return 0;
   usleep(30*1000000L);// thirty seconds
   printf("main()\n");
   srand(time(NULL));
