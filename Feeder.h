@@ -224,6 +224,7 @@ public:
 };
 /* ********************************************************************** */
 class JunkYard { // this holds experimental scraps to be cleaned and added to other parts
+public:
   /* ********************************************************************** */
   void Parse() {
     string line;
@@ -259,6 +260,39 @@ class JunkYard { // this holds experimental scraps to be cleaned and added to ot
         cout << elems.at(cnt) << "\n";
       }
     }
+  }
+  /* ********************************************************************** */
+  static void ParseYahoo(std::string txt) {
+    string glob;
+    std::string field;
+    //std::string txt = "what,goes,here:folks";
+    //std::string txt = "";
+    char delim = ',';
+    std::vector<std::string> elems;//http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c
+    //"4/8/2014",  "4:00pm",  66.76,  1.36,  20.35,  "HOG",  "Harley-Davidson, "
+    split2(txt, delim, elems, 6);
+
+    int siz = elems.size();
+    for (int cnt=0; cnt<siz; cnt++) {
+      find_and_replace(elems.at(cnt), "\"", "");// remove quotes
+      field = elems.at(cnt);
+      //std::replace( field.begin(), field.end(), 'x', 'y'); // replace all 'x' to 'y'
+      cout << field << "\n";
+    }
+    std::string ValueTxt = elems.at(2);
+    std::string SymbolTxt = elems.at(5);
+    cout << "SymbolTxt" << SymbolTxt << '\n';
+    cout << "ValueTxt" << ValueTxt << '\n';
+    double value = atof(ValueTxt.c_str());
+    // double value = strtod (ValueTxt.c_str(), NULL);
+  }
+  static uint64_t TxtDex(char *txt){
+    uint64_t retval = 0;
+    for (int cnt=0;cnt<sizeof(uint64_t);cnt++){
+      retval <<= 8;
+      retval |= txt[cnt];
+    }
+    return retval;
   }
   /* ********************************************************************** */
   int MainFile() {

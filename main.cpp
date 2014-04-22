@@ -22,6 +22,8 @@ HOWEVER, we cannot dispose of the master feed through refcounting. could have de
 #include <stdint.h>
 #include <thread> // std::thread
 #include <atomic> // std::atomic
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 #include <hash_map>
 
@@ -489,6 +491,28 @@ void FeedTest() {
 }
 /* ********************************************************************** */
 int main() {
+
+  uint64_t zult;
+  zult = JunkYard::TxtDex("ABCDEFG");
+  //printf("zult[%X]\n", zult);
+  printf("zult[%016llX]\n", zult);// hex         zult[4142434445464700]
+  printf("zult[%" PRIu64 "]\n", zult); // dec zult[4702394921427289856]
+  //cout << "zult[" << zult << "]\n";
+  return 0;
+
+  JunkYard::ParseYahoo("\"4/8/2014\",  \"4:00pm\",  66.76,  1.36,  20.35,  \"HOG\",  \"Harley-Davidson, \"");
+  return 0;
+
+  std::string field = "hello, folks, there,";
+  //std::replace(field.begin(), field.end(), ',', 'X');
+  find_and_replace(field, ",", "");
+  //std::replace(field.begin(), field.end(), ',', "");
+  //field.replace(field.begin(), field.end(), ',', 'X');
+  //std::replace(field.begin(), field.end(), ",", "X");
+  //field.replace(field.begin(), field.end(), ",", "X");
+  cout << "[" << field << "]";
+  return 0;
+
   FeedTest(); return 0;
   usleep(30*1000000L);// thirty seconds
   printf("main()\n");

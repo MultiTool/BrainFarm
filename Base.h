@@ -193,6 +193,14 @@ std::vector<std::string> split(const std::string &s, char delim) {
   return elems;
 }
 
+/* **************************************************************************** */
+void find_and_replace(string& source, string const& find, string const& replace){
+  for(std::string::size_type siz = 0; (siz = source.find(find, siz)) != std::string::npos;){
+    source.replace(siz, find.length(), replace);// http://minhazulhaque.blogspot.com/2012/09/find-and-replace-all-occurrences-in-cpp-string.html.html
+    siz += replace.length() - find.length() + 1;
+  }
+}
+
 #if false
 /* **************************************************************************** */
 static void Distribution()
