@@ -491,18 +491,32 @@ void FeedTest() {
 }
 /* ********************************************************************** */
 int main() {
+  if (true) {
+    uint64_t zult;
+    //zult = JunkYard::TxtDex("ABCDEFG");
+    //zult = JunkYard::TxtDex("ABCDE");
+    //zult = JunkYard::TxtDex("ZZZZZ");
+    zult = JunkYard::TxtDex("zzzzz");
+    printf("zult[%016llX]\n", zult);
+    zult = JunkYard::TxtDex(".....");
+    printf("zult[%016llX]\n", zult);
+    zult = JunkYard::TxtDex("........");// maximum
+    printf("zult[%016llX]\n", zult);
+    //printf("zult[%X]\n", zult);
+    //printf("zult[%016llX]\n", zult);// hex         zult[4142434445464700]
+    //printf("zult[%" PRIu64 "]\n", zult); // dec zult[4702394921427289856]
+    //cout << "zult[" << zult << "]\n";
+  }
+  if (true) {
+    IoJackBase IoJack;
+    //JunkYard::ParseYahoo("\"4/8/2014\",  \"4:00pm\",  66.76,  1.36,  20.35,  \"HOG\",  \"Harley-Davidson, \"", &IoJack);
+    JunkYard::ParseYahoo("\"4/8/2014\",\"4:00pm\",4.11,2.43,13.46,\"BBD-B.TO\",\"BOMBARDIER INC., \"", &IoJack);
 
-  uint64_t zult;
-  zult = JunkYard::TxtDex("ABCDEFG");
-  //printf("zult[%X]\n", zult);
-  printf("zult[%016llX]\n", zult);// hex         zult[4142434445464700]
-  printf("zult[%" PRIu64 "]\n", zult); // dec zult[4702394921427289856]
-  //cout << "zult[" << zult << "]\n";
+    printf("IoJack.PortId[%016llX]\n", IoJack.PortId);// hex         zult[4142434445464700]
+    printf("IoJack.Value[%f]\n", IoJack.Value); // dec zult[4702394921427289856]
+  }
   return 0;
-
-  JunkYard::ParseYahoo("\"4/8/2014\",  \"4:00pm\",  66.76,  1.36,  20.35,  \"HOG\",  \"Harley-Davidson, \"");
-  return 0;
-
+  // std::find_if()
   std::string field = "hello, folks, there,";
   //std::replace(field.begin(), field.end(), ',', 'X');
   find_and_replace(field, ",", "");

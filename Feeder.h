@@ -72,6 +72,7 @@ public:
 class WebFeeder : public Feeder {
 public:
   CURL *curl;
+  // http://finance.yahoo.com/d/quotes.csv?s=XOM+BBDb.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn
   std::string readBuffer;
   std::string baseurl = "http://finance.yahoo.com/d/quotes.csv";
   std::string bigurl = baseurl + "?s=XOM+BBDb.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn";
@@ -262,7 +263,60 @@ public:
     }
   }
   /* ********************************************************************** */
-  static void ParseYahoo(std::string txt) {
+  inline static uint64_t BaseN(char chr) {
+    uint64_t num = 0;
+    if ('0' <= chr && chr <= '9') {
+      num = chr - 48;
+    } else if ('A' <= chr && chr <= 'Z') {
+      num = 10 + (chr - 65);
+    } else  if ('a' <= chr && chr <= 'z') {
+      num = 10 + (chr - 97);
+    } else  if (chr == '-') {
+      num = 36;
+    } else  if (chr == '.') {
+      num = 37; // TextRadix-1
+    } else {
+      printf("Character out of range!");
+    }
+    return num;
+  }
+  #define TextRadix 38;
+  #define ShiftDist 6
+  #define MaxShifts ((sizeof(uint64_t)*8)/ShiftDist)
+  /* ********************************************************************** */
+  inline static uint64_t TxtDex(const std::string &line) {
+    const char *txt = line.c_str();// final number will NOT sort alphabetically
+    uint64_t retval = 0;// http://eoddata.com/stocklist/NYSE/B.htm
+    uint32_t lsiz = line.size();
+    if (lsiz>5){
+      printf("Symbol is too long!");
+    }
+    int limit = min(MaxShifts, lsiz);// not right in this context, redo
+    for (int cnt=0; cnt<limit; cnt++) {
+      retval *= TextRadix; // more compact than shifting
+      retval += BaseN(txt[cnt]);
+    }
+    //retval *= pow(TextRadix, (???-limit));// uncomment if you want order to be alphabetical
+    return retval;
+  }
+  /* ********************************************************************** */
+  inline static uint64_t TxtDex2(const std::string &line) {
+    const char *txt = line.c_str();// final number will NOT sort alphabetically
+    uint64_t retval = 0;// http://eoddata.com/stocklist/NYSE/B.htm
+    uint32_t lsiz = line.size();
+    if (lsiz>5){
+      printf("Symbol is too long!");
+    }
+    int limit = min(MaxShifts, lsiz);
+    for (int cnt=0; cnt<limit; cnt++) {
+      retval <<= ShiftDist;
+      retval |= BaseN(txt[cnt]);
+    }
+    //retval <<= (ShiftDist*(MaxShifts-limit));// uncomment if you want order to be alphabetical
+    return retval;
+  }
+  /* ********************************************************************** */
+  static void ParseYahoo(const std::string txt, IoJackBase *IoJack) {
     string glob;
     std::string field;
     //std::string txt = "what,goes,here:folks";
@@ -281,18 +335,17 @@ public:
     }
     std::string ValueTxt = elems.at(2);
     std::string SymbolTxt = elems.at(5);
-    cout << "SymbolTxt" << SymbolTxt << '\n';
-    cout << "ValueTxt" << ValueTxt << '\n';
+    // http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring trim would be better
+    find_and_replace(SymbolTxt, " ", "");// remove spaces
+    cout << "SymbolTxt[" << SymbolTxt << "]\n";
+    cout << "ValueTxt[" << ValueTxt << "]\n";
+
+    uint64_t hashdex = TxtDex(SymbolTxt);
     double value = atof(ValueTxt.c_str());
+
+    IoJack->PortId = hashdex;
+    IoJack->Value = value;
     // double value = strtod (ValueTxt.c_str(), NULL);
-  }
-  static uint64_t TxtDex(char *txt){
-    uint64_t retval = 0;
-    for (int cnt=0;cnt<sizeof(uint64_t);cnt++){
-      retval <<= 8;
-      retval |= txt[cnt];
-    }
-    return retval;
   }
   /* ********************************************************************** */
   int MainFile() {
