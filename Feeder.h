@@ -83,6 +83,7 @@ public:
   int FetchCnt;
   /* ********************************************************************** */
   WebFeeder() {
+    BuildUrl();
     baseurl = "http://finance.yahoo.com/d/quotes.csv";
     bigurl = baseurl + "?s=XOM+BBDb.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn";
     url = bigurl.c_str();
@@ -134,6 +135,22 @@ public:
     //printf("%s", txt);
     glob = readBuffer;
     FetchCnt++;
+  }
+  /* ********************************************************************** */
+  void SortSymbols() {
+    std::sort(symbols.begin(), symbols.end());
+  }
+  /* ********************************************************************** */
+  void BuildUrl() {
+    SortSymbols();
+    std::string symtxt;
+    std::string UrlTxt = baseurl + "?s=";
+    size_t siz = symbols.size();
+    for (int cnt=0;cnt<siz;cnt++){
+      symtxt = symbols.at(cnt);
+      UrlTxt.append(symtxt + "+");
+    }
+    UrlTxt.append(" &f=d1t1l1yrsn");
   }
   /* ********************************************************************** */
   static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
