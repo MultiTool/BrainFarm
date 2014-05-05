@@ -200,7 +200,24 @@ void find_and_replace(string& source, string const& find, string const& replace)
     siz += replace.length() - find.length() + 1;
   }
 }
-
+/* **************************************************************************** */
+const std::string WhiteSpaces( " \f\n\r\t\v" );
+void TrimRight( std::string& str, const std::string& TrimChars = WhiteSpaces )
+{//http://stackoverflow.com/questions/479080/trim-is-not-part-of-the-standard-c-c-library
+   std::string::size_type pos = str.find_last_not_of( TrimChars );
+   str.erase( pos + 1 );
+}
+void TrimLeft( std::string& str, const std::string& TrimChars = WhiteSpaces )
+{//http://stackoverflow.com/questions/479080/trim-is-not-part-of-the-standard-c-c-library
+   std::string::size_type pos = str.find_first_not_of( TrimChars );
+   str.erase( 0, pos );
+}
+void Trim( std::string& str, const std::string& TrimChars = WhiteSpaces )
+{//http://stackoverflow.com/questions/479080/trim-is-not-part-of-the-standard-c-c-library
+   TrimRight( str, TrimChars );
+   TrimLeft( str, TrimChars );
+}
+/* **************************************************************************** */
 #if false
 /* **************************************************************************** */
 static void Distribution()

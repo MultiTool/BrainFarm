@@ -72,12 +72,12 @@ public:
 class WebFeeder : public Feeder {
 public:
   CURL *curl;
-  // http://finance.yahoo.com/d/quotes.csv?s=XOM+BBDb.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn
+  // http://finance.yahoo.com/d/quotes.csv?s=XOM+BBD-B.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn
   std::string readBuffer;
   std::string baseurl = "http://finance.yahoo.com/d/quotes.csv";
-  std::string bigurl = baseurl + "?s=XOM+BBDb.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn";
+  std::string bigurl = baseurl + "?s=XOM+BBD-B.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn";
   std::vector<std::string> symbols {
-    "XOM", "BBDb.TO", "JNJ", "MSFT", "WAG", "HOG", "AAPL", "BAC", "FLPSX", "VTI", "RHT", "NVAX", "WDAY", "HALO", "TSLA", "LNKD"
+    "XOM", "BBD-B.TO", "JNJ", "MSFT", "WAG", "HOG", "AAPL", "BAC", "FLPSX", "VTI", "RHT", "NVAX", "WDAY", "HALO", "TSLA", "LNKD"
   };
   const char *url = bigurl.c_str();
   int FetchCnt;
@@ -85,7 +85,7 @@ public:
   WebFeeder() {
     BuildUrl();
     baseurl = "http://finance.yahoo.com/d/quotes.csv";
-    bigurl = baseurl + "?s=XOM+BBDb.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn";
+    bigurl = baseurl + "?s=XOM+BBD-B.TO+JNJ+MSFT+WAG+HOG+AAPL+BAC+FLPSX+VTI+RHT+NVAX+WDAY+HALO+TSLA+LNKD &f=d1t1l1yrsn";
     url = bigurl.c_str();
     FetchCnt = 0;
   }
@@ -146,7 +146,7 @@ public:
     std::string symtxt;
     std::string UrlTxt = baseurl + "?s=";
     size_t siz = symbols.size();
-    for (int cnt=0;cnt<siz;cnt++){
+    for (int cnt=0; cnt<siz; cnt++) {
       symtxt = symbols.at(cnt);
       UrlTxt.append(symtxt + "+");
     }
@@ -297,15 +297,15 @@ public:
     }
     return num;
   }
-  #define TextRadix 38;
-  #define ShiftDist 6
-  #define MaxShifts ((sizeof(uint64_t)*8)/ShiftDist)
+#define TextRadix 38;
+#define ShiftDist 6
+#define MaxShifts ((sizeof(uint64_t)*8)/ShiftDist)
   /* ********************************************************************** */
   inline static uint64_t TxtDex(const std::string &line) {
     const char *txt = line.c_str();// final number will NOT sort alphabetically
     uint64_t retval = 0;// http://eoddata.com/stocklist/NYSE/B.htm
     uint32_t lsiz = line.size();
-    if (lsiz>5){
+    if (lsiz>5) {
       printf("Symbol is too long!");
     }
     int limit = min(MaxShifts, lsiz);// not right in this context, redo
@@ -321,7 +321,7 @@ public:
     const char *txt = line.c_str();// final number will NOT sort alphabetically
     uint64_t retval = 0;// http://eoddata.com/stocklist/NYSE/B.htm
     uint32_t lsiz = line.size();
-    if (lsiz>5){
+    if (lsiz>5) {
       printf("Symbol is too long!");
     }
     int limit = min(MaxShifts, lsiz);
@@ -345,15 +345,15 @@ public:
 
     int siz = elems.size();
     for (int cnt=0; cnt<siz; cnt++) {
-      find_and_replace(elems.at(cnt), "\"", "");// remove quotes
+      Trim(elems.at(cnt));// remove spaces
+      Trim(elems.at(cnt),"\"");// remove quotes
       field = elems.at(cnt);
       //std::replace( field.begin(), field.end(), 'x', 'y'); // replace all 'x' to 'y'
-      cout << field << "\n";
+      cout << "[" << field << "]\n";
     }
     std::string ValueTxt = elems.at(2);
     std::string SymbolTxt = elems.at(5);
     // http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring trim would be better
-    find_and_replace(SymbolTxt, " ", "");// remove spaces
     cout << "SymbolTxt[" << SymbolTxt << "]\n";
     cout << "ValueTxt[" << ValueTxt << "]\n";
 
@@ -380,6 +380,52 @@ public:
     else cout << "Unable to open file";
 
     return 0;
+  }
+  /* ********************************************************************** */
+  std::vector<std::string> ParseLine2(const std::string &linetxt) {
+    std::vector<std::string> ray0 = split(linetxt, '"');
+    std::vector<std::string> ray1;
+    std::vector<std::string> rayout;
+    std::string txt0, txt1;
+    bool inquote = false;
+    size_t siz0 = ray0.size();
+    {
+      txt0 = ray0.at(0);
+      ray1 = split(txt0, ',');
+      size_t siz1 = ray1.size(); siz1--;
+      for (int cnt1=0; cnt1<siz1; cnt1++) {
+        txt1 = ray1.at(cnt1);
+        rayout.push_back(txt1);
+      }
+      inquote=true;
+    }
+    for (int cnt0=1; cnt0<siz0; cnt0++){
+      txt0 = ray0.at(cnt0);
+      if (!inquote) { // even, not quoted, split more
+        ray1 = split(txt0, ',');
+        size_t siz1 = ray1.size(); siz1--; // clip off ends
+        for (int cnt1=1; cnt1<siz1; cnt1++) {
+          txt1 = ray1.at(cnt1);
+          rayout.push_back(txt1);
+        }
+        inquote=true;
+      } else { // odd, quoted, copy whole
+        rayout.push_back(txt0);
+        inquote=false;
+      }
+    }
+    if (!inquote){
+      txt0 = ray0.at(siz0-1);
+      ray1 = split(txt0, ',');
+      size_t siz1 = ray1.size();
+      for (int cnt1=1; cnt1<siz1; cnt1++) {
+        txt1 = ray1.at(cnt1);
+        rayout.push_back(txt1);
+      }
+      inquote=true;
+    }
+    printf("return rayout;\n");
+    return rayout;
   }
   /* ********************************************************************** */
   std::vector<std::string> ParseLine(const std::string &linetxt) {

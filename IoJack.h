@@ -10,6 +10,7 @@ typedef class IoJackBase *IoJackBasePtr;
 class IoJackBase {
 public:
   IoDexType PortId;
+  std::string PortName;
   uint32_t refcnt;
   double Value;
   double UpwardValue;
