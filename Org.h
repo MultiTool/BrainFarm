@@ -232,6 +232,33 @@ public:
       this->Score[cnt]*=Factor;
     }
   }
+#if 1
+  /* ********************************************************************** */
+  void Calculate_Score() {
+    NodePtr node;
+    double Real, Guessed, Temp0, Temp1, SumScore0, SumScore1;
+    IoJackPtr Jack;
+    size_t siz;
+    siz = this->GlobalJackVec.size();
+    SumScore0 = 1.0; SumScore1 = 0.0;
+    for (int ncnt=0; ncnt<siz; ncnt++) {
+      Jack = this->GlobalJackVec.at(ncnt);
+      Guessed = Jack->UpwardValue;
+      Real = Jack->GetValue();
+      Temp0 = (2.0-fabs(Real-Guessed))/2.0;
+      Temp0+=1.0;
+      Temp1 = math_sgn(Guessed)*math_sgn(Real);
+      if (fabs(Temp1)<Fudge) {
+        bool nop = true;
+      }
+      SumScore0 *= Temp0;
+      SumScore1 += Temp1;
+    }
+    this->Score[0] += SumScore0;
+    this->Score[1] += SumScore1;
+    bool nop = true;
+  }
+#else
   /* ********************************************************************** */
   void Calculate_Score() {
     NodePtr node;
@@ -246,7 +273,7 @@ public:
       Real = Jack->GetValue();
       Temp0 = math_sgn(Guessed)*math_sgn(Real);
       Temp1 = Guessed*Real;
-      if (fabs(Temp1)<Fudge){
+      if (fabs(Temp1)<Fudge) {
         bool nop = true;
       }
       SumScore0 += Temp0;
@@ -256,6 +283,7 @@ public:
     this->Score[1] += SumScore1;
     bool nop = true;
   }
+#endif
   /* ********************************************************************** */
   void Update_From_Feed() {
     IoJackPtr LocalJack;

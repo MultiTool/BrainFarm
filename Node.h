@@ -213,6 +213,7 @@ public:
     if (this->MyType == IoType::GlobalIO) {
       this->Jack->UpwardValue += this->NextFireVal;
       this->FireVal = this->Jack->GetValue();
+      //printf("this->FireVal[%f]\n", this->FireVal);
     } else {
       this->FireVal = this->NextFireVal;
     }

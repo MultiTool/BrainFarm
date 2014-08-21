@@ -73,8 +73,8 @@ using namespace __gnu_cxx;
 #define math_sgn(num) ((num>0)?1:((num<0)?-1:0))
 
 //#define zee 'b'
-//#define zee 'c'
-#define zee 'm'
+#define zee 'c'
+//#define zee 'm'
 //#define zee 'z'
 
 typedef uint64_t UidType;

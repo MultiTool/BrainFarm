@@ -406,11 +406,11 @@ void PopSession() {
   printf("PopSession()\n");
   //int NumGenerations = 50;
   //int NumGenerations = 100;
-  int NumGenerations = 500;
+  //int NumGenerations = 500;
   //int NumGenerations = 1000;
   //int NumGenerations = 4000;
   int CleanPause = 1;//16
-  //int NumGenerations = 1000000;// for about 10 hours
+  int NumGenerations = 1000000;// for about 10 hours
   int MaxSize=0, SumSize = 0, AvgSize=0;
 
   printf("Pop_Create!\n");
@@ -438,7 +438,8 @@ void PopSession() {
     printf("\n");
 
     if (NumGenerations-gencnt > 20) { // stop mutating for 20 generations in the final stretch
-      pop->Mutate(0.8, 0.8);
+      //pop->Mutate(0.8, 0.8);
+      pop->Mutate(0.8, 0.1);
     }
     if (gencnt % CleanPause == 0) {
       pop->Clean_Inventory();
@@ -507,28 +508,29 @@ int main() {
     //printf("zult[%" PRIu64 "]\n", zult); // dec zult[4702394921427289856]
     //cout << "zult[" << zult << "]\n";
   }
-  if (true) {
+  if (false) {
     IoJackBase IoJack;
     //JunkYard::ParseYahoo("\"4/8/2014\",  \"4:00pm\",  66.76,  1.36,  20.35,  \"HOG\",  \"Harley-Davidson, \"", &IoJack);
     JunkYard::ParseYahoo("\"4/8/2014\",\"4:00pm\",4.11,2.43,13.46,\"BBD-B.TO\",\"BOMBARDIER INC., \"", &IoJack);
 
     printf("IoJack.PortId[%016llX]\n", IoJack.PortId);// hex         zult[4142434445464700]
     printf("IoJack.Value[%f]\n", IoJack.Value); // dec zult[4702394921427289856]
+    return 0;
   }
-  return 0;
-  // std::find_if()
-  std::string field = "hello, folks, there,";
-  //std::replace(field.begin(), field.end(), ',', 'X');
-  find_and_replace(field, ",", "");
-  //std::replace(field.begin(), field.end(), ',', "");
-  //field.replace(field.begin(), field.end(), ',', 'X');
-  //std::replace(field.begin(), field.end(), ",", "X");
-  //field.replace(field.begin(), field.end(), ",", "X");
-  cout << "[" << field << "]";
-  return 0;
-
-  FeedTest(); return 0;
-  usleep(30*1000000L);// thirty seconds
+  if (false) {
+    // std::find_if()
+    std::string field = "hello, folks, there,";
+    //std::replace(field.begin(), field.end(), ',', 'X');
+    find_and_replace(field, ",", "");
+    //std::replace(field.begin(), field.end(), ',', "");
+    //field.replace(field.begin(), field.end(), ',', 'X');
+    //std::replace(field.begin(), field.end(), ",", "X");
+    //field.replace(field.begin(), field.end(), ",", "X");
+    cout << "[" << field << "]";
+    return 0;
+  }
+  // FeedTest(); return 0;
+  //usleep(30*1000000L);// thirty seconds
   printf("main()\n");
   srand(time(NULL));
   PopSession(); return 0;
