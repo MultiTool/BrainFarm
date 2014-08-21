@@ -304,11 +304,11 @@ public:
   inline static uint64_t TxtDex(const std::string &line) {
     const char *txt = line.c_str();// final number will NOT sort alphabetically
     uint64_t retval = 0;// http://eoddata.com/stocklist/NYSE/B.htm
-    uint32_t lsiz = line.size();
+    uint64_t lsiz = line.size();
     if (lsiz>5) {
       printf("Symbol is too long!");
     }
-    int limit = min(MaxShifts, lsiz);// not right in this context, redo
+    int limit = std::min(MaxShifts, lsiz);// not right in this context, redo
     for (int cnt=0; cnt<limit; cnt++) {
       retval *= TextRadix; // more compact than shifting
       retval += BaseN(txt[cnt]);
@@ -320,11 +320,11 @@ public:
   inline static uint64_t TxtDex2(const std::string &line) {
     const char *txt = line.c_str();// final number will NOT sort alphabetically
     uint64_t retval = 0;// http://eoddata.com/stocklist/NYSE/B.htm
-    uint32_t lsiz = line.size();
+    uint64_t lsiz = line.size();
     if (lsiz>5) {
       printf("Symbol is too long!");
     }
-    int limit = min(MaxShifts, lsiz);
+    int limit = std::min(MaxShifts, lsiz);
     for (int cnt=0; cnt<limit; cnt++) {
       retval <<= ShiftDist;
       retval |= BaseN(txt[cnt]);

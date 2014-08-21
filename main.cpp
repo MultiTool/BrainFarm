@@ -28,7 +28,7 @@ HOWEVER, we cannot dispose of the master feed through refcounting. could have de
 #include <hash_map>
 //#include <conio.h>
 //#include <ctype.h>
-#include <windows.h>
+//#include <windows.h>
 
 #include "Org.h"
 #include "Pop.h"
@@ -454,6 +454,7 @@ void PopSession() {
     org0->Print_Jacks();
     printf("\n");
 
+#if false
     if(GetAsyncKeyState( 'X' ) & 0x8000)
     { // the 'X' key is currently being held down
       if(KeepGoing) {
@@ -461,6 +462,7 @@ void PopSession() {
         KeepGoing = false;
       }
     }
+#endif
     if (NumGenerations-gencnt > 20) { // stop mutating for 20 generations in the final stretch
       //pop->Mutate(0.8, 0.8);
       //pop->Mutate(0.8, 0.1);
