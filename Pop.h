@@ -4,7 +4,8 @@
 #include "Org.h"
 #include "Lugar.h"
 
-#define popmax 1000
+//#define popmax 1000
+#define popmax 300
 //#define popmax 100
 
 
@@ -84,7 +85,7 @@ public:
   /* ********************************************************************** */
   void Gen() { // new generation
     uint32_t popsize = this->forestv.size();
-    int Fire_Test_Cycles = 100;
+    int Fire_Test_Cycles = 200;
     //int Fire_Test_Cycles = 10;
     //MaxNeuroGens
     LugarPtr lugar;
@@ -97,7 +98,9 @@ public:
     for (int fcnt=0; fcnt<Fire_Test_Cycles; fcnt++) {
       this->GlobalFeed->NextGen();
       this->Fire_Cycle();
-      this->Calculate_Scores();
+      if (100 < fcnt){
+        this->Calculate_Scores();
+      }
     }
 
     /*
@@ -108,17 +111,21 @@ public:
     Record_Scores();
     OrgPtr bestbeast = ScoreDexv[0];
     OrgPtr leastbeast = ScoreDexv[this->popsz-2];
-    double avgbeast = AvgBeast();
+    //double avgbeast = AvgBeastScore(1.0);
     Birth_And_Death(SurvivalRate);
   }
   /* ********************************************************************** */
-  double AvgBeast() {
+  double AvgBeastScore(double TopPercent) {
     size_t siz = ScoreDexv.size();
+    size_t Limit = (TopPercent*(double)siz);
     double sum = 0.0;
-    for (int cnt=0; cnt<siz; cnt++) {
-      sum += ScoreDexv[cnt]->Score[0];
+    //for (int cnt=0; cnt<siz; cnt++) {
+    for (int cnt=0; cnt<Limit; cnt++) {
+      //sum += ScoreDexv[cnt]->Score[0];
+      sum += ScoreDexv[cnt]->Score[1];
     }
-    sum /= (double)siz;
+    //sum /= (double)siz;
+    sum /= (double)Limit;
     return sum;
   }
   /* ********************************************************************** */

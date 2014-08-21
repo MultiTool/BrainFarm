@@ -171,7 +171,7 @@ namespace FR {
         for (cnt=0; cnt<bitrange; cnt++) { /* up from 0 to 15. */
           /* if strata found, recurse. */
           if (node[cnt].down.next!=NULL) {
-            Recurse_Destroy(node[cnt].down.next,depth,leafkill);
+            Recurse_Destroy(node[cnt].down.next, depth, leafkill);
             node[cnt].down.next=NULL;
           }
         }
@@ -195,7 +195,7 @@ namespace FR {
     ************************************************************* */
     {
       if (topnode.num_children>0) {
-        Recurse_Destroy(topnode.down.next,0,leafkill);
+        Recurse_Destroy(topnode.down.next, 0, leafkill);
         topnode.down.next=NULL; topnode.num_children=0;
       }
     }/* Destroy */

@@ -72,8 +72,11 @@ using namespace __gnu_cxx;
 #define freesafe(obj) free(obj)
 #define math_sgn(num) ((num>0)?1:((num<0)?-1:0))
 
+//#define zee 'a'
 //#define zee 'b'
-#define zee 'c'
+//#define zee 'c'
+//#define zee 'd'
+#define zee 'e'
 //#define zee 'm'
 //#define zee 'z'
 

@@ -26,6 +26,9 @@ HOWEVER, we cannot dispose of the master feed through refcounting. could have de
 #include <inttypes.h>
 
 #include <hash_map>
+//#include <conio.h>
+//#include <ctype.h>
+#include <windows.h>
 
 #include "Org.h"
 #include "Pop.h"
@@ -408,10 +411,14 @@ void PopSession() {
   //int NumGenerations = 100;
   //int NumGenerations = 500;
   //int NumGenerations = 1000;
+  //int NumGenerations = 3000;
   //int NumGenerations = 4000;
-  int CleanPause = 1;//16
   int NumGenerations = 1000000;// for about 10 hours
+  bool KeepGoing = true;
+  int CleanPause = 1;//16
   int MaxSize=0, SumSize = 0, AvgSize=0;
+  double SumScore0 = 0.0, SumScore1 = 0.0;
+  double SumAvgAvgScore = 0.0;
 
   printf("Pop_Create!\n");
   pop = new Pop();
@@ -430,16 +437,36 @@ void PopSession() {
 
     org0 = pop->ScoreDexv[0];//org0 = pop->forestv[0]->tenant;
     int numnodes = org0->NGene.size();
+    double AvgBeastScore = pop->AvgBeastScore(0.75);
+    SumAvgAvgScore += AvgBeastScore;
     double score0 = org0->Score[0];
     double score1 = org0->Score[1];
+    SumScore0 += score0;
+    SumScore1 += score1;
+
+    double AvgAvgScore = SumAvgAvgScore/(double)(gencnt+1.0);
+    double avgscore0 = SumScore0/(double)(gencnt+1.0);
+    double avgscore1 = SumScore1/(double)(gencnt+1.0);
     int NumJacks = org0->GlobalJackVec.size();
-    printf("Pop_Gen:%04li, s:%6.2f, %7.2f, numnodes:%3li, NumJacks:%1li: ", gencnt, score0, score1, numnodes, NumJacks);
+    printf("Pop_Gen:%04li, s:%6.2f, %7.2f, %7.2f, numnodes:%3li, NumJacks:%1li: ", gencnt, score0, score1, AvgBeastScore, numnodes, NumJacks);
+    printf("%7.2f, %7.2f ", avgscore0, avgscore1);
+    printf("%7.2f, ", AvgAvgScore);
     org0->Print_Jacks();
     printf("\n");
 
+    if(GetAsyncKeyState( 'X' ) & 0x8000)
+    { // the 'X' key is currently being held down
+      if(KeepGoing) {
+        NumGenerations = gencnt + 30;// hell hack
+        KeepGoing = false;
+      }
+    }
     if (NumGenerations-gencnt > 20) { // stop mutating for 20 generations in the final stretch
       //pop->Mutate(0.8, 0.8);
-      pop->Mutate(0.8, 0.1);
+      //pop->Mutate(0.8, 0.1);
+      //pop->Mutate(0.2, 0.2);
+      //pop->Mutate(0.1, 0.1);
+      pop->Mutate(0.05, 0.05);
     }
     if (gencnt % CleanPause == 0) {
       pop->Clean_Inventory();
@@ -456,7 +483,7 @@ void PopSession() {
   }
   gettimeofday(&tm1, NULL);
 
-  {
+  { // final survey
     pop->Print_Sorted_Scores();
     org0 = pop->ScoreDexv.at(pop->ScoreDexv.size()-1);
     org0 = pop->forestv[0]->tenant;

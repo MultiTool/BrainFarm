@@ -13,6 +13,7 @@
 #include "IoJack.h"
 
 #define WeightAmp 2.0;
+#define WeightShiftAmp 0.2;
 
 const uint16_t Num_IoTypes = 3;
 namespace IoType {
@@ -63,11 +64,14 @@ public:
   static LinkPtr Abiogenate() {
     LinkPtr lnp = new Link();
     lnp->Disuse=0;
-    lnp->Mutate_Weight();
+    lnp->Randomize_Weight();
     return lnp;
   }
-  void Mutate_Weight() {
+  void Randomize_Weight() {
     this->Weight = (frand()-0.5) * WeightAmp;// to do: do this with a distribution change
+  }
+  void Mutate_Weight() {
+    this->Weight += ((frand()*2.0)-1.0) * WeightShiftAmp;// to do: do this with a distribution change
   }
   void Print_Me() {
     bugprintf("  Link USID:%li, ", this->USID);
