@@ -13,7 +13,8 @@
 #include "IoJack.h"
 
 #define WeightAmp 2.0;
-#define WeightShiftAmp 0.2;
+// #define WeightShiftAmp 0.2;
+#define WeightShiftAmp 1.0;
 
 const uint16_t Num_IoTypes = 3;
 namespace IoType {
@@ -72,6 +73,9 @@ public:
   }
   void Mutate_Weight() {
     this->Weight += ((frand()*2.0)-1.0) * WeightShiftAmp;// to do: do this with a distribution change
+  }
+  void Mutate_Weight(double WeightFuzzAmp) {
+    this->Weight += ((frand()*2.0)-1.0) * WeightFuzzAmp;// to do: do this with a distribution change
   }
   void Print_Me() {
     bugprintf("  Link USID:%li, ", this->USID);

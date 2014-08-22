@@ -232,7 +232,7 @@ public:
       this->Score[cnt]*=Factor;
     }
   }
-#if 2
+#if 1
   /* ********************************************************************** */
   void Calculate_Score() {
     NodePtr node;

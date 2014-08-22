@@ -93,12 +93,15 @@ public:
     uint32_t pcnt;
     LugarPtr place;
 
+    int RTerm = rand()%7;// advance the feed randomly so the Orgs will have to listen for the phase to guess right
+    for (int fcnt=0; fcnt<RTerm; fcnt++) {
+      this->GlobalFeed->NextGen();
+    }
     Clear_Scores();
-
     for (int fcnt=0; fcnt<Fire_Test_Cycles; fcnt++) {
       this->GlobalFeed->NextGen();
       this->Fire_Cycle();
-      if (100 < fcnt){
+      if (100 <= fcnt){
         this->Calculate_Scores();
       }
     }
@@ -204,9 +207,10 @@ public:
   /* ********************************************************************** */
   void Mutate(double Pop_MRate, double Org_MRate) {
     OrgPtr org;
-    size_t LastOrg;
+    size_t FirstOrg, LastOrg;
+    FirstOrg = 10;// experiment: preserve the best performers intact
     size_t siz = this->ScoreDexv.size(); LastOrg = siz-1;
-    for (int cnt=0; cnt<LastOrg; cnt++) {
+    for (int cnt=FirstOrg; cnt<LastOrg; cnt++) {
       if (frand()<Pop_MRate) {
         org = this->ScoreDexv[cnt];// lugar->tenant;
         org->Mutate_Me(Org_MRate);
@@ -215,6 +219,28 @@ public:
     org = this->ScoreDexv[LastOrg];// very last mutant is 100% randomized, to introduce 'new blood'
     org->Rand_Init();
   }
+#if false
+for brainfarm, we really need good metrics.
+success is determined by being digitally close to answer within X limit for Y time (plateau) - then quit.
+but for each quit, play game over again from scratch, get Z trials and avg them. (maybe repeat until avg is stable.)
+
+also analog close?
+
+VERY time consuming. what parameters are most important?
+start with easy goals, 2 or 3 at first
+
+ramp mutation pop rate0 is overall average rate
+rate2 = rate0*2;
+for (cnt = 0 to siz){
+  rate = (((double)cnt) / (double)siz)*rate2;
+  if (rand<rate){
+  }
+}
+works until rate is over 0.5
+
+OR, just do the solid X percent of the pop, starting at bottom. no random about it.
+
+#endif
   /* ********************************************************************** */
   void Connect_Jacks(FeedPtr food) {
     size_t siz = this->forestv.size();

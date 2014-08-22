@@ -299,7 +299,7 @@ public:
   }
 #define TextRadix 38;
 #define ShiftDist 6
-#define MaxShifts ((sizeof(uint64_t)*8)/ShiftDist)
+#define MaxShifts ((uint64_t)((sizeof(uint64_t)*8)/ShiftDist))
   /* ********************************************************************** */
   inline static uint64_t TxtDex(const std::string &line) {
     const char *txt = line.c_str();// final number will NOT sort alphabetically
