@@ -471,8 +471,8 @@ void PopSession() {
       //pop->Mutate(0.05, 0.05);
       //pop->Mutate(0.1, 0.05);// 10% of population is 5% mutated
       //pop->Mutate(0.3, 0.05);// 30% of population is 5% mutated
-      pop->Mutate(0.5, 0.05);// 50% of population is 5% mutated
-      //pop->Mutate(0.2, 0.05);// 20% of population is 5% mutated
+      //pop->Mutate(0.5, 0.05);// 50% of population is 5% mutated  ******
+      pop->Mutate(0.2, 0.05);// 20% of population is 5% mutated
       //pop->Mutate(0.2, 0.01);// 20% of population is 1% mutated
     }
     if (gencnt % CleanPause == 0) {
