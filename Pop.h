@@ -85,7 +85,7 @@ public:
   /* ********************************************************************** */
   void Gen() { // new generation
     uint32_t popsize = this->forestv.size();
-    int Fire_Test_Cycles = 200;
+    int Fire_Test_Cycles = 20;
     //int Fire_Test_Cycles = 10;
     //MaxNeuroGens
     LugarPtr lugar;
@@ -101,7 +101,7 @@ public:
     for (int fcnt=0; fcnt<Fire_Test_Cycles; fcnt++) {
       this->GlobalFeed->NextGen();
       this->Fire_Cycle();
-      if (100 <= fcnt){
+      if (10 <= fcnt){
         this->Calculate_Scores();
       }
     }
