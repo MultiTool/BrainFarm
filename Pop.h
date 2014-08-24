@@ -5,8 +5,8 @@
 #include "Lugar.h"
 
 //#define popmax 1000
-#define popmax 300
-//#define popmax 100
+//#define popmax 300
+#define popmax 100
 
 
 /* ********************************************************************** */
@@ -208,6 +208,21 @@ public:
   }
   /* ********************************************************************** */
   void Mutate(double Pop_MRate, double Org_MRate) {
+    OrgPtr org;
+    size_t siz = this->ScoreDexv.size();
+    size_t Num2Mutate = (Pop_MRate * (double)siz);
+    size_t FirstOrg, LastOrg;
+    LastOrg = siz-1;
+    FirstOrg = siz-Num2Mutate;
+    for (int cnt=LastOrg-1; cnt>=FirstOrg; cnt--) {
+      org = this->ScoreDexv[cnt];// lugar->tenant;
+      org->Mutate_Me(Org_MRate);
+    }
+    org = this->ScoreDexv[LastOrg];// very last mutant is 100% randomized, to introduce 'new blood'
+    org->Rand_Init();
+  }
+  /* ********************************************************************** */
+  void Mutate2(double Pop_MRate, double Org_MRate) {
     OrgPtr org;
     size_t FirstOrg, LastOrg;
     FirstOrg = 10;// experiment: preserve the best performers intact

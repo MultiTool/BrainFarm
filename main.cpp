@@ -413,7 +413,8 @@ void PopSession() {
   //int NumGenerations = 1000;
   //int NumGenerations = 3000;
   //int NumGenerations = 4000;
-  int NumGenerations = 1000000;// for about 10 hours
+  //int NumGenerations = 1000000;// for about 10 hours
+  int NumGenerations = 10000000;
   bool KeepGoing = true;
   int CleanPause = 1;//16
   int MaxSize=0, SumSize = 0, AvgSize=0;
@@ -471,8 +472,8 @@ void PopSession() {
       //pop->Mutate(0.05, 0.05);
       //pop->Mutate(0.1, 0.05);// 10% of population is 5% mutated
       //pop->Mutate(0.3, 0.05);// 30% of population is 5% mutated
-      //pop->Mutate(0.5, 0.05);// 50% of population is 5% mutated  ******
-      pop->Mutate(0.2, 0.05);// 20% of population is 5% mutated
+      pop->Mutate(0.5, 0.05);// 50% of population is 5% mutated  ******
+      //pop->Mutate(0.2, 0.05);// 20% of population is 5% mutated
       //pop->Mutate(0.2, 0.01);// 20% of population is 1% mutated
     }
     if (gencnt % CleanPause == 0) {
