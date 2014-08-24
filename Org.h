@@ -232,6 +232,24 @@ public:
       this->Score[cnt]*=Factor;
     }
   }
+  /* ********************************************************************** */
+  bool Succeeded(double Margin) {
+    bool Success = true;
+    double Real, Guessed, Error;
+    IoJackPtr Jack;
+    size_t siz;
+    siz = this->GlobalJackVec.size();
+    for (int ncnt=0; ncnt<siz; ncnt++) {
+      Jack = this->GlobalJackVec.at(ncnt);
+      Guessed = Jack->UpwardValue;
+      Real = Jack->GetValue();
+      Error = (fabs(Real-Guessed))/2.0;
+      if (Error>Margin){
+        Success = false; break;
+      }
+    }
+    return Success;
+  }
 #if 1
   /* ********************************************************************** */
   void Calculate_Score() {
