@@ -250,6 +250,30 @@ public:
     }
     return Success;
   }
+  /* ********************************************************************** */
+  bool Calculate_Score_And_Success(double Margin) {
+    bool Success = true;
+    NodePtr node;
+    double Real, Guessed, Error, Temp0, Temp1, SumScore0, SumScore1;
+    IoJackPtr Jack;
+    size_t siz;
+    siz = this->GlobalJackVec.size();
+    SumScore0 = 1.0; SumScore1 = 0.0;
+    for (int ncnt=0; ncnt<siz; ncnt++) {
+      Jack = this->GlobalJackVec.at(ncnt);
+      Guessed = Jack->UpwardValue;
+      Real = Jack->GetValue();
+      Error = (fabs(Real-Guessed))/2.0;// range 0.0 to 1.0
+      Temp0 = (1.0-Error)+1.0;// range 1.0 to 2.0
+      Temp1 = math_sgn(Guessed)*math_sgn(Real);
+      if (Error>Margin){ Success = false; }
+      SumScore0 *= Temp0;
+      SumScore1 += Temp1;
+    }
+    this->Score[0] += SumScore0;
+    this->Score[1] += SumScore1;
+    return Success;
+  }
 #if 1
   /* ********************************************************************** */
   void Calculate_Score() {
