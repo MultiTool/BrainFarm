@@ -414,12 +414,14 @@ void PopSession() {
   //int NumGenerations = 3000;
   //int NumGenerations = 4000;
   //int NumGenerations = 1000000;// for about 10 hours
-  int NumGenerations = 10000000;
+  //int NumGenerations = 10000000;// ten million
+  int NumGenerations = 100000000;// hundred million
   bool KeepGoing = true;
   int CleanPause = 1;//16
   int MaxSize=0, SumSize = 0, AvgSize=0;
   double SumScore0 = 0.0, SumScore1 = 0.0;
   double SumAvgAvgScore = 0.0;
+  double FlywheelScore = 0.0;
 
   printf("Pop_Create!\n");
   pop = new Pop();
@@ -448,10 +450,13 @@ void PopSession() {
     double AvgAvgScore = SumAvgAvgScore/(double)(gencnt+1.0);
     double avgscore0 = SumScore0/(double)(gencnt+1.0);
     double avgscore1 = SumScore1/(double)(gencnt+1.0);
+    FlywheelScore = (FlywheelScore*0.999) + (score1*0.001);
+
     int NumJacks = org0->GlobalJackVec.size();
     printf("Pop_Gen:%04li, s:%6.2f, %7.2f, %7.2f, numnodes:%3li, NumJacks:%1li: ", gencnt, score0, score1, AvgBeastScore, numnodes, NumJacks);
     printf("%7.2f, %7.2f ", avgscore0, avgscore1);
     printf("%7.2f, ", AvgAvgScore);
+    printf("fw:%5.2f,  ", FlywheelScore);
     org0->Print_Jacks();
     printf("\n");
 
@@ -469,7 +474,7 @@ void PopSession() {
       //pop->Mutate(0.8, 0.1);
       //pop->Mutate(0.2, 0.2);
       //pop->Mutate(0.1, 0.1);
-      //pop->Mutate(0.05, 0.05);
+      //pop->Mutate(0.05, 0.05);// 5% of population is 5% mutated
       //pop->Mutate(0.1, 0.05);// 10% of population is 5% mutated
       //pop->Mutate(0.3, 0.05);// 30% of population is 5% mutated
       pop->Mutate(0.5, 0.05);// 50% of population is 5% mutated  ******
