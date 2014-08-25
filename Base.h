@@ -76,8 +76,8 @@ using namespace __gnu_cxx;
 //#define zee 'b'
 //#define zee 'c'
 //#define zee 'd'
-#define zee 'e'
-//#define zee 'f'
+//#define zee 'e'
+#define zee 'f'
 //#define zee 'm'
 //#define zee 'z'
 
