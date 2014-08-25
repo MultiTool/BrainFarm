@@ -28,7 +28,6 @@ HOWEVER, we cannot dispose of the master feed through refcounting. could have de
 #include <hash_map>
 //#include <conio.h>
 //#include <ctype.h>
-//#include <windows.h>
 
 #include "Org.h"
 #include "Pop.h"
@@ -422,6 +421,7 @@ void PopSession() {
   double SumScore0 = 0.0, SumScore1 = 0.0;
   double SumAvgAvgScore = 0.0;
   double FlywheelScore = 0.0;
+  int SuccessRunCnt = 0;
 
   printf("Pop_Create!\n");
   pop = new Pop();
@@ -444,6 +444,8 @@ void PopSession() {
     SumAvgAvgScore += AvgBeastScore;
     double score0 = org0->Score[0];
     double score1 = org0->Score[1];
+    bool Success = org0->Success;
+    if (Success){ SuccessRunCnt++; }else{ SuccessRunCnt = 0; }
     SumScore0 += score0;
     SumScore1 += score1;
 
@@ -456,19 +458,18 @@ void PopSession() {
     printf("Pop_Gen:%04li, s:%6.2f, %7.2f, %7.2f, numnodes:%3li, NumJacks:%1li: ", gencnt, score0, score1, AvgBeastScore, numnodes, NumJacks);
     printf("%7.2f, %7.2f ", avgscore0, avgscore1);
     printf("%7.2f, ", AvgAvgScore);
-    printf("fw:%5.2f,  ", FlywheelScore);
+    printf("fw:%5.2f, ", FlywheelScore);
+    printf("[%s],  ", Success ? "X" : "o");
+
     org0->Print_Jacks();
     printf("\n");
 
-#if false
-    if(GetAsyncKeyState( 'X' ) & 0x8000)
-    { // the 'X' key is currently being held down
+    if (SuccessRunCnt>50){
       if(KeepGoing) {
         NumGenerations = gencnt + 30;// hell hack
         KeepGoing = false;
       }
     }
-#endif
     if (NumGenerations-gencnt > 20) { // stop mutating for 20 generations in the final stretch
       //pop->Mutate(0.8, 0.8);
       //pop->Mutate(0.8, 0.1);

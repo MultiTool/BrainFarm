@@ -20,6 +20,7 @@ public:
   typedef struct ScorePair { double Score[2]; };
   std::vector<ScorePair> ScoreBuf;// for recording scores even after some creatures are dead
   uint32_t MaxNeuroGens = 2000;
+  uint64_t BioGenCnt;
   double SurvivalRate = 0.5;
   FeedPtr GlobalFeed;
   /* ********************************************************************** */
@@ -34,6 +35,7 @@ public:
     forestv.resize(popsize);
     ScoreDexv.resize(popsize);
     ScoreBuf.resize(popsize);
+    BioGenCnt = 0;
     for (pcnt=0; pcnt<popsize; pcnt++) {
       lugar = new Lugar();
       org = Org::Abiogenate(); lugar->Attach_Tenant(org);
@@ -83,10 +85,18 @@ public:
     }
   }
   /* ********************************************************************** */
+  void Calculate_Score_And_Success(double Margin) {
+    OrgPtr org;
+    size_t siz = this->ScoreDexv.size();
+    for (size_t cnt=0; cnt<siz; cnt++) {
+      org=this->ScoreDexv.at(cnt);
+      org->Calculate_Score_And_Success(Margin);
+    }
+  }
+  /* ********************************************************************** */
   void Gen() { // new generation
     uint32_t popsize = this->forestv.size();
     int Fire_Test_Cycles = 50;
-    //int Fire_Test_Cycles = 10;
     int Test_Len = 10;
     int Start_Testing = Fire_Test_Cycles-Test_Len;
     //MaxNeuroGens
@@ -95,29 +105,29 @@ public:
     uint32_t pcnt;
     LugarPtr place;
 
-    int RTerm = rand()%7;// advance the feed randomly so the Orgs will have to listen for the phase to guess right
+    //int RTerm = rand()%7;// advance the feed randomly so the Orgs will have to listen for the phase to guess right
+    int RTerm = BioGenCnt%7;// advance the feed abitrarily each time so the Orgs will have to listen for the phase to guess right
     for (int fcnt=0; fcnt<RTerm; fcnt++) {
       this->GlobalFeed->NextGen();
     }
-    Clear_Scores();
+    this->Clear_Scores();
     for (int fcnt=0; fcnt<Fire_Test_Cycles; fcnt++) {
       this->GlobalFeed->NextGen();
       this->Fire_Cycle();
       if (Start_Testing <= fcnt){
-        this->Calculate_Scores();
+        //this->Calculate_Score_And_Success(0.25);// must be within .25 of right answer (max dist is 1.0, any dist >=0.5 is digitally wrong)
+        this->Calculate_Score_And_Success(0.45);// must be within .45 of right answer (max dist is 1.0, any dist >=0.5 is digitally wrong)
       }
     }
 
-    /*
-    place holder
-    first we need to score and sort the parents, then we create children
-    */
+    /* First score and sort the parents, then create children. */
     Sort();
     Record_Scores();
     OrgPtr bestbeast = ScoreDexv[0];
     OrgPtr leastbeast = ScoreDexv[this->popsz-2];
     //double avgbeast = AvgBeastScore(1.0);
     Birth_And_Death(SurvivalRate);
+    BioGenCnt++;
   }
   /* ********************************************************************** */
   double AvgBeastScore(double TopPercent) {

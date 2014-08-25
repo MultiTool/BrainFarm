@@ -35,6 +35,7 @@ public:
   NodeVec NGene;
   NodeVec *NGenePtr;
   IoJackVec GlobalJackVec;
+  bool Success;
   /* ********************************************************************** */
   Org() {
     NGenePtr = &(NGene);
@@ -42,6 +43,7 @@ public:
       this->Score[cnt] = 0.0;
     }
     this->home = NULL;
+    this->Success=false;
   }
   /* ********************************************************************** */
   ~Org() {
@@ -216,6 +218,7 @@ public:
   }
   /* ********************************************************************** */
   void Clear_Score() {
+    this->Success = true;
     for (int cnt=0; cnt<NumScores; cnt++) {
       this->Score[cnt]=0.0;
     }
@@ -233,8 +236,8 @@ public:
     }
   }
   /* ********************************************************************** */
-  bool Succeeded(double Margin) {
-    bool Success = true;
+  bool Calculate_Success(double Margin) {
+    bool SuccessTemp = true;
     double Real, Guessed, Error;
     IoJackPtr Jack;
     size_t siz;
@@ -245,14 +248,15 @@ public:
       Real = Jack->GetValue();
       Error = (fabs(Real-Guessed))/2.0;
       if (Error>Margin){
-        Success = false; break;
+        SuccessTemp = false; break;
       }
     }
-    return Success;
+    this->Success = this->Success && SuccessTemp;
+    return SuccessTemp;
   }
   /* ********************************************************************** */
-  bool Calculate_Score_And_Success(double Margin) {
-    bool Success = true;
+  void Calculate_Score_And_Success(double Margin) {
+    bool SuccessTemp = true;
     NodePtr node;
     double Real, Guessed, Error, Temp0, Temp1, SumScore0, SumScore1;
     IoJackPtr Jack;
@@ -266,13 +270,13 @@ public:
       Error = (fabs(Real-Guessed))/2.0;// range 0.0 to 1.0
       Temp0 = (1.0-Error)+1.0;// range 1.0 to 2.0
       Temp1 = math_sgn(Guessed)*math_sgn(Real);
-      if (Error>Margin){ Success = false; }
+      if (Error>Margin){ SuccessTemp = false; }
       SumScore0 *= Temp0;
       SumScore1 += Temp1;
     }
     this->Score[0] += SumScore0;
     this->Score[1] += SumScore1;
-    return Success;
+    this->Success = this->Success && SuccessTemp;
   }
 #if 1
   /* ********************************************************************** */
