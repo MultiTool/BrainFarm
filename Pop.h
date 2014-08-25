@@ -105,8 +105,12 @@ public:
     uint32_t pcnt;
     LugarPtr place;
 
-    //int RTerm = rand()%7;// advance the feed randomly so the Orgs will have to listen for the phase to guess right
-    int RTerm = BioGenCnt%7;// advance the feed abitrarily each time so the Orgs will have to listen for the phase to guess right
+    int RTerm;
+    if (false){
+      RTerm = rand()%7;// advance the feed randomly so the Orgs will have to listen for the phase to guess right
+    }else{
+      RTerm = BioGenCnt%7;// advance the feed arbitrarily each time so the Orgs will have to listen for the phase to guess right
+    }
     for (int fcnt=0; fcnt<RTerm; fcnt++) {
       this->GlobalFeed->NextGen();
     }
