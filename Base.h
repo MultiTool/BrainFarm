@@ -74,12 +74,18 @@ using namespace __gnu_cxx;
 
 //#define zee 'a'
 //#define zee 'b'
-//#define zee 'c'
+#define zee 'c'
 //#define zee 'd'
 //#define zee 'e'
-#define zee 'f'
+//#define zee 'f'
 //#define zee 'm'
 //#define zee 'z'
+
+class JackSpecs{
+public:
+  static char Zee;
+};
+char JackSpecs::Zee = zee;
 
 typedef uint64_t UidType;
 typedef std::vector<UidType> UidVec;

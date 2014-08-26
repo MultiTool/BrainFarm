@@ -1,9 +1,18 @@
-//next();
 /*
 ******************************************************
 
-create IoJack class, fill big vector with these.
-create big IO status/feed vector.
+next to do:
+
+* lots of metrics.  effect of weight fuzz amplitude, effect of mutation rates, 
+
+* Change challenge away from feed, but instead to mirror a randomly-created model network.
+(probably should fork the project to get away from feeds) Mimic? Copycat? BeatMatch? Carbon? Imitator? Mock? 
+
+* Support twinning networks, and test. with twinning though, you need different io jacks for self-talk vs. mirror talk.
+
+* Measure efficiency of RARE random crossover 
+
+
 create alternative node class, with
   IOspecies type (done)
   IOdex (chosen from master feed vector)
@@ -29,6 +38,7 @@ HOWEVER, we cannot dispose of the master feed through refcounting. could have de
 //#include <conio.h>
 //#include <ctype.h>
 
+#include "Base.h"
 #include "Org.h"
 #include "Pop.h"
 #include "flexray.h"
@@ -363,13 +373,13 @@ public:
   };
   int ThreadTest2()
   {
-#if false
+#if 1
     std::vector<std::thread> threads;
 
     std::cout << "increase global counter with 10 threads...\n";
-    for (int cnt=1; cnt<=10; ++cnt)
+    for (int cnt=1; cnt<=10; ++cnt) {
       threads.push_back(std::thread(&Hilos::increase_global, this, 1000));
-
+    }
     // http://stackoverflow.com/questions/14453329/how-do-i-pass-an-instance-member-function-as-callback-to-stdthread
     //std::thread myThread(&Hilos::handler,this);
     if (false) {
@@ -406,14 +416,11 @@ void PopSession() {
   uint32_t gencnt;
   // 3.129000 seconds for a pop of 100, for 100 generations
   printf("PopSession()\n");
-  //int NumGenerations = 50;
-  //int NumGenerations = 100;
-  //int NumGenerations = 500;
-  //int NumGenerations = 1000;
-  //int NumGenerations = 3000;
-  //int NumGenerations = 4000;
-  //int NumGenerations = 1000000;// for about 10 hours
-  //int NumGenerations = 10000000;// ten million
+
+  JackSpecs::Zee = 'd';// now we can change this at runtime to do metrics
+  //JackSpecs::Zee = 'e';// now we can change this at runtime to do metrics
+
+  //int NumGenerations = 10000000;// ten million, for about 10 hours
   int NumGenerations = 100000000;// hundred million
   bool KeepGoing = true;
   int CleanPause = 1;//16
@@ -444,8 +451,8 @@ void PopSession() {
     SumAvgAvgScore += AvgBeastScore;
     double score0 = org0->Score[0];
     double score1 = org0->Score[1];
-    bool Success = org0->Success;
-    if (Success){ SuccessRunCnt++; }else{ SuccessRunCnt = 0; }
+    bool Undefeated = org0->Invicto;
+    if (Undefeated){ SuccessRunCnt++; }else{ SuccessRunCnt = 0; }
     SumScore0 += score0;
     SumScore1 += score1;
 
@@ -459,7 +466,7 @@ void PopSession() {
     printf("%7.2f, %7.2f ", avgscore0, avgscore1);
     printf("%7.2f, ", AvgAvgScore);
     printf("fw:%5.2f, ", FlywheelScore);
-    printf("[%s],  ", Success ? "X" : "o");
+    printf("[%s],  ", Undefeated ? "X" : "o");
 
     org0->Print_Jacks();
     printf("\n");
@@ -513,7 +520,7 @@ void PopSession() {
   double t0 = FullTime(tm0);
   double t1 = FullTime(tm1);
   double delta = t1-t0;
-  bugprintf("delta T:%f\n", delta);
+  bugprintf("delta T:%f,  minutes:%f\n", delta, delta/60.0);
   bugprintf("Pop_Delete! %f\n", pop->forestv[0]->tenant->Score[0]);
   delete pop;
 }

@@ -147,7 +147,8 @@ public:
       break;
     case 1:
       ndp->MyType = IoType::GlobalIO;
-      ndp->IoSpeciesId = 'a' + rand()%(1+zee-'a');
+      //ndp->IoSpeciesId = 'a' + rand()%(1+zee-'a');
+      ndp->IoSpeciesId = 'a' + rand()%(1+JackSpecs::Zee-'a');
       break;
     case 2:
       ndp->MyType = IoType::NbrIO;
@@ -156,6 +157,10 @@ public:
     ndp->SpeciesId = IdMaker::MakeId();
     ndp->FireVal = ((frand()*2.0)-1.0)*0.001;
     ndp->NextFireVal = ((frand()*2.0)-1.0)*0.001;
+
+    //printf("[%ld]", IdMaker::UidSource);
+    //printf("[%c]", JackSpecs::Zee);
+
     return ndp;
   }
   /* ********************************************************************** */
@@ -371,7 +376,8 @@ public:
       int randint = rand()%Num_IoTypes;
       // no waitaminute, this creates a net flow from majority types to minority types, favoring an equal proportion of all IO types even when selection didn't like that.
       this->MyType=static_cast<IoType::IoType>(randint);
-      this->IoSpeciesId = 'a' + rand()%(1+zee-'a');
+      //this->IoSpeciesId = 'a' + rand()%(1+zee-'a');
+      this->IoSpeciesId = 'a' + rand()%(1+JackSpecs::Zee-'a');
       // but, if most nodes come from duplication, and type-mutation is very rare, then proportion will tend to be perserved.
     }
   }

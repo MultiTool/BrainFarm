@@ -35,7 +35,7 @@ public:
   NodeVec NGene;
   NodeVec *NGenePtr;
   IoJackVec GlobalJackVec;
-  bool Success;
+  bool Invicto;//Undefeated
   /* ********************************************************************** */
   Org() {
     NGenePtr = &(NGene);
@@ -43,7 +43,7 @@ public:
       this->Score[cnt] = 0.0;
     }
     this->home = NULL;
-    this->Success=false;
+    this->Invicto=false;
   }
   /* ********************************************************************** */
   ~Org() {
@@ -218,7 +218,7 @@ public:
   }
   /* ********************************************************************** */
   void Clear_Score() {
-    this->Success = true;
+    this->Invicto = true;
     for (int cnt=0; cnt<NumScores; cnt++) {
       this->Score[cnt]=0.0;
     }
@@ -251,7 +251,7 @@ public:
         SuccessTemp = false; break;
       }
     }
-    this->Success = this->Success && SuccessTemp;
+    this->Invicto = this->Invicto && SuccessTemp;
     return SuccessTemp;
   }
   /* ********************************************************************** */
@@ -276,7 +276,7 @@ public:
     }
     this->Score[0] += SumScore0;
     this->Score[1] += SumScore1;
-    this->Success = this->Success && SuccessTemp;
+    this->Invicto = this->Invicto && SuccessTemp;
   }
 #if 1
   /* ********************************************************************** */

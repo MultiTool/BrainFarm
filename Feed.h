@@ -49,7 +49,8 @@ public:
     GlobalIoJackPtr jack;
     char ch;
     ch = 'a';
-    while (ch<=zee) {
+    //while (ch<=zee) {
+    while (ch<=JackSpecs::Zee) {
       jack = new GlobalIoJack(); this->Ports.push_back(jack);
       jack->PortId = ch;
       ch++;
