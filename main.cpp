@@ -3,14 +3,14 @@
 
 next to do:
 
-* lots of metrics.  effect of weight fuzz amplitude, effect of mutation rates, 
+* lots of metrics.  effect of weight fuzz amplitude, effect of mutation rates,
 
 * Change challenge away from feed, but instead to mirror a randomly-created model network.
-(probably should fork the project to get away from feeds) Mimic? Copycat? BeatMatch? Carbon? Imitator? Mock? 
+(probably should fork the project to get away from feeds) Mimic? Copycat? BeatMatch? Carbon? Imitator? Mock?
 
 * Support twinning networks, and test. with twinning though, you need different io jacks for self-talk vs. mirror talk.
 
-* Measure efficiency of RARE random crossover 
+* Measure efficiency of RARE random crossover
 
 
 create alternative node class, with
@@ -333,7 +333,7 @@ void baz(int x) {
 }
 /* ********************************************************************** */
 void ThreadTest() {
-#if false
+#if 1
   // http://www.cplusplus.com/reference/thread/thread/thread/
   std::thread first (foo);     // spawn new thread that calls foo()
   std::thread second (bar,0);  // spawn new thread that calls bar(0)
@@ -393,8 +393,9 @@ public:
 #if false
     std::cout << "increase counter (bar2) with 10 threads using member...\n";
     Catom bar2;
-    for (int cnt=1; cnt<=10; ++cnt)
+    for (int cnt=1; cnt<=10; ++cnt){
       threads.push_back(std::thread(&Catom::increase_member,std::ref(bar2),1000));
+    }
 #endif
 
     std::cout << "synchronizing all threads...\n";
