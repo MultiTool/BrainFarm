@@ -418,8 +418,9 @@ void PopSession() {
   // 3.129000 seconds for a pop of 100, for 100 generations
   printf("PopSession()\n");
 
-  JackSpecs::Zee = 'd';// now we can change this at runtime to do metrics
+  //JackSpecs::Zee = 'd';// now we can change this at runtime to do metrics
   //JackSpecs::Zee = 'e';// now we can change this at runtime to do metrics
+  JackSpecs::Zee = 'f';// now we can change this at runtime to do metrics
 
   //int NumGenerations = 10000000;// ten million, for about 10 hours
   int NumGenerations = 100000000;// hundred million
@@ -521,7 +522,7 @@ void PopSession() {
   double t0 = FullTime(tm0);
   double t1 = FullTime(tm1);
   double delta = t1-t0;
-  bugprintf("delta T:%f,  minutes:%f\n", delta, delta/60.0);
+  bugprintf("delta T:%f,  minutes:%f,  hours:%f\n", delta, delta/60.0, delta/3600.0);
   bugprintf("Pop_Delete! %f\n", pop->forestv[0]->tenant->Score[0]);
   delete pop;
 }
