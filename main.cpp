@@ -3,7 +3,7 @@
 
 next to do:
 
-* lots of metrics.  effect of weight fuzz amplitude, effect of mutation rates,
+* lots of metrics.  raw base average generations for X, effect of weight fuzz amplitude, effect of mutation rates, effect of pop size, crossover?
 
 * Change challenge away from feed, but instead to mirror a randomly-created model network.
 (probably should fork the project to get away from feeds) Mimic? Copycat? BeatMatch? Carbon? Imitator? Mock?
