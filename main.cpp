@@ -393,7 +393,7 @@ public:
 #if false
     std::cout << "increase counter (bar2) with 10 threads using member...\n";
     Catom bar2;
-    for (int cnt=1; cnt<=10; ++cnt){
+    for (int cnt=1; cnt<=10; ++cnt) {
       threads.push_back(std::thread(&Catom::increase_member,std::ref(bar2),1000));
     }
 #endif
@@ -409,6 +409,10 @@ public:
 #endif
   }
 };
+
+int NumTrials;
+double TotalGensToSuccess, AvgGensToSuccess;
+int GensToSuccess;
 /* ********************************************************************** */
 void PopSession() {
   size_t PopMaxSize;
@@ -416,11 +420,14 @@ void PopSession() {
   OrgPtr org0;
   uint32_t gencnt;
   // 3.129000 seconds for a pop of 100, for 100 generations
-  printf("PopSession()\n");
-
+  if(false){
+    printf("PopSession()\n");
+  }
+  //JackSpecs::Zee = 'b';// now we can change this at runtime to do metrics
+  JackSpecs::Zee = 'c';// now we can change this at runtime to do metrics
   //JackSpecs::Zee = 'd';// now we can change this at runtime to do metrics
   //JackSpecs::Zee = 'e';// now we can change this at runtime to do metrics
-  JackSpecs::Zee = 'f';// now we can change this at runtime to do metrics
+  //JackSpecs::Zee = 'f';// now we can change this at runtime to do metrics
 
   //int NumGenerations = 10000000;// ten million, for about 10 hours
   int NumGenerations = 100000000;// hundred million
@@ -432,12 +439,14 @@ void PopSession() {
   double FlywheelScore = 0.0;
   int SuccessRunCnt = 0;
 
-  printf("Pop_Create!\n");
+  //printf("Pop_Create!\n");
   pop = new Pop();
-  printf("Pop Init! %li\n", pop->forestv.size());
+  //printf("Pop Init! %li\n", pop->forestv.size());
 
   Feed food;
-  printf("GenerateTestPorts()\n");
+  if(false){
+    printf("GenerateTestPorts()\n");
+  }
   food.GenerateTestPorts();
   pop->Attach_Global_Feed(&food);
 
@@ -454,7 +463,7 @@ void PopSession() {
     double score0 = org0->Score[0];
     double score1 = org0->Score[1];
     bool Undefeated = org0->Invicto;
-    if (Undefeated){ SuccessRunCnt++; }else{ SuccessRunCnt = 0; }
+    if (Undefeated) { SuccessRunCnt++; } else { SuccessRunCnt = 0; }
     SumScore0 += score0;
     SumScore1 += score1;
 
@@ -463,17 +472,17 @@ void PopSession() {
     double avgscore1 = SumScore1/(double)(gencnt+1.0);
     FlywheelScore = (FlywheelScore*0.999) + (score1*0.001);
 
-    int NumJacks = org0->GlobalJackVec.size();
-    printf("Pop_Gen:%04li, s:%6.2f, %7.2f, %7.2f, numnodes:%3li, NumJacks:%1li: ", gencnt, score0, score1, AvgBeastScore, numnodes, NumJacks);
-    printf("%7.2f, %7.2f ", avgscore0, avgscore1);
-    printf("%7.2f, ", AvgAvgScore);
-    printf("fw:%5.2f, ", FlywheelScore);
-    printf("[%s],  ", Undefeated ? "X" : "o");
-
-    org0->Print_Jacks();
-    printf("\n");
-
-    if (SuccessRunCnt>50){
+    if (false) {
+      int NumJacks = org0->GlobalJackVec.size();
+      printf("Pop_Gen:%04li, s:%6.2f, %7.2f, %7.2f, numnodes:%3li, NumJacks:%1li: ", gencnt, score0, score1, AvgBeastScore, numnodes, NumJacks);
+      printf("%7.2f, %7.2f ", avgscore0, avgscore1);
+      printf("%7.2f, ", AvgAvgScore);
+      printf("fw:%5.2f, ", FlywheelScore);
+      printf("[%s],  ", Undefeated ? "X" : "o");
+      org0->Print_Jacks();
+      printf("\n");
+    }
+    if (SuccessRunCnt>50) {
       if(KeepGoing) {
         NumGenerations = gencnt + 30;// hell hack
         KeepGoing = false;
@@ -487,9 +496,14 @@ void PopSession() {
       //pop->Mutate(0.05, 0.05);// 5% of population is 5% mutated
       //pop->Mutate(0.1, 0.05);// 10% of population is 5% mutated
       //pop->Mutate(0.3, 0.05);// 30% of population is 5% mutated
-      pop->Mutate(0.5, 0.05);// 50% of population is 5% mutated  ******
+      //pop->Mutate(0.5, 0.05);// 50% of population is 5% mutated  ******
+      pop->Mutate(0.5, 0.20);// 50% of population is 20% mutated  ******
+      //pop->Mutate(0.5, 0.40);// 50% of population is 20% mutated  ******
+      //pop->Mutate(0.8, 0.05);// 80% of population is 5% mutated  ******
+      //pop->Mutate(0.9, 0.05);// 90% of population is 5% mutated  ******
       //pop->Mutate(0.2, 0.05);// 20% of population is 5% mutated
       //pop->Mutate(0.2, 0.01);// 20% of population is 1% mutated
+      //pop->Mutate(0.05, 0.05);
     }
     if (gencnt % CleanPause == 0) {
       pop->Clean_Inventory();
@@ -505,26 +519,41 @@ void PopSession() {
     SumSize += org0->NGene.size();
   }
   gettimeofday(&tm1, NULL);
-
-  { // final survey
+  GensToSuccess = gencnt;
+  TotalGensToSuccess += GensToSuccess;
+  AvgGensToSuccess = TotalGensToSuccess/(double)NumTrials;
+  if (false) { // final survey
     pop->Print_Sorted_Scores();
     org0 = pop->ScoreDexv.at(pop->ScoreDexv.size()-1);
     org0 = pop->forestv[0]->tenant;
     if (false) {
-      bugprintf("Org 0, gen:%li, ", NumGenerations-1);
+      bugprintf("Org 0, gen:%li, ", GensToSuccess);
       org0->Print_Me();
     }
-    bugprintf("Org 0, gen:%li, ", NumGenerations-1);
-    AvgSize = SumSize/(double)NumGenerations;
+    bugprintf("Org 0, GensToSuccess:%li, ", GensToSuccess);
+    AvgSize = SumSize/(double)GensToSuccess;
     bugprintf("size:%i, MaxSize:%i, AvgSize:%i\n", org0->NGene.size(), MaxSize, AvgSize);
   }
-
-  double t0 = FullTime(tm0);
-  double t1 = FullTime(tm1);
-  double delta = t1-t0;
-  bugprintf("delta T:%f,  minutes:%f,  hours:%f\n", delta, delta/60.0, delta/3600.0);
-  bugprintf("Pop_Delete! %f\n", pop->forestv[0]->tenant->Score[0]);
+  if(false){
+    double t0 = FullTime(tm0);
+    double t1 = FullTime(tm1);
+    double delta = t1-t0;
+    bugprintf("delta T:%f,  minutes:%f,  hours:%f\n", delta, delta/60.0, delta/3600.0);
+    bugprintf("Pop_Delete! %f\n", pop->forestv[0]->tenant->Score[0]);
+  }
   delete pop;
+}
+/* ********************************************************************** */
+void RepeatPopTest() {
+  NumTrials = 0;
+  TotalGensToSuccess=0; AvgGensToSuccess=0;
+  for (int cnt=0;cnt<300;cnt++){
+    NumTrials++;
+    printf("TrialNum:%li, ", NumTrials);
+    PopSession();
+    printf("GensToSuccess:%li, ", GensToSuccess);
+    printf("AvgGensToSuccess:%f\n", AvgGensToSuccess);
+  }
 }
 /* ********************************************************************** */
 void FeedTest() {
@@ -542,7 +571,7 @@ void FeedTest() {
 }
 /* ********************************************************************** */
 int main() {
-  if (true) {
+  if (false) {
     uint64_t zult;
     //zult = JunkYard::TxtDex("ABCDEFG");
     //zult = JunkYard::TxtDex("ABCDE");
@@ -583,6 +612,7 @@ int main() {
   //usleep(30*1000000L);// thirty seconds
   printf("main()\n");
   srand(time(NULL));
+  RepeatPopTest(); return 0;
   PopSession(); return 0;
   Hilos hil;
   hil.ThreadTest2(); return 0;;
