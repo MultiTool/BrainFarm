@@ -163,6 +163,38 @@ public:
     }
   }
   /* ********************************************************************** */
+  void Node_Crossover(NodePtr Other) {// recombination, assumes nodes are sorted by SpeciesId
+    NodePtr resident, dupe;
+    size_t ndex = TreeSearchMyNodes(0, Other->SpeciesId);
+    //if (ndex<this->NGene.size()){ resident = this->NGene.at(ndex); }
+    if((ndex<this->NGene.size()) && (resident = this->NGene.at(ndex))->SpeciesId == Other->SpeciesId){// replace
+    //if(resident->SpeciesId == Other->SpeciesId){// replace
+      delete resident;
+      dupe = Other->Spawn();
+      this->NGene.at(ndex) = dupe;
+    }else{// insert
+      if (this->NGene.size()>=NodeNumLimit) {return;}
+      dupe = Other->Spawn();
+      this->NGene.insert(this->NGene.begin() + ndex, dupe);// first we would have to find the right index.
+    }
+    // this->NGene.push_back(dupe); Remove_Duplicate_Nodes();
+
+    /*
+how to handle this? either block adding a node before the gene overflows, or first add it and then remove the dupe randomly afterward.
+
+but more importantly, if nodes are sorted in advance, we can search to the right place. if found, replace existing.
+if not found, insert. OR append and then sort.
+
+if we added a lot, then we'd merge two parents.
+
+one: append, sort, remove if dupe (dupe remove requires re-packing the vector)
+two: find, replace if dupe or insert (insert requires re-packing the vector)
+
+two is better if we can avoid sorting.
+
+    */
+  }
+  /* ********************************************************************** */
   void Sort_Nodes() {
     std::sort (NGene.begin(), NGene.end(), AscendingNodeUid);
   }
@@ -179,6 +211,11 @@ public:
       child->NGene.at(cnt) = ndp;
     }
     return child;
+  }
+  /* ********************************************************************** */
+  NodePtr Get_Random_Node(){
+    size_t dex = rand() % this->NGene.size();
+    return (this->NGene.at(dex));
   }
   /* ********************************************************************** */
   static bool AscendingNodeUid(NodePtr b0, NodePtr b1) {
@@ -522,6 +559,19 @@ public:
       ID_prev=ndp->SpeciesId;
     }
     return true;
+  }
+  /* ********************************************************************** */
+  size_t TreeSearchMyNodes(size_t startplace, UidType target) {// assumes Node list has been sorted by ID, ascending
+    size_t LoDex, MedDex, HiDex;
+    NodePtr MedNode;
+    LoDex=startplace; HiDex=this->NGene.size();
+    while (LoDex<HiDex) {
+      MedDex = (LoDex+HiDex)/2;
+      MedNode = this->NGene.at(MedDex);
+      if (target <= MedNode->SpeciesId) { HiDex = MedDex; }
+      else { LoDex = MedDex+1; }
+    }
+    return LoDex;
   }
   /* ********************************************************************** */
   void Clean_Me() {

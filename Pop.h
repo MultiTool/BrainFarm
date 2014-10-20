@@ -221,6 +221,28 @@ public:
     }
   }
   /* ********************************************************************** */
+  void Crossover(size_t Num2Mutate) {
+    size_t FirstOrg, dex;
+    OrgPtr org_get, org_give;
+    NodePtr tnode;
+    size_t siz = this->ScoreDexv.size();
+    FirstOrg = siz-Num2Mutate;
+
+if (Num2Mutate<=0){
+    printf("Num2Mutate\n");
+  //throw 12345;
+}
+    dex = FirstOrg + (rand() % Num2Mutate);
+
+    org_get = this->ScoreDexv[dex];
+
+    dex = rand() % siz;
+    org_give = this->ScoreDexv[dex];
+    tnode = org_give->Get_Random_Node();
+
+    org_get->Node_Crossover(tnode);
+  }
+  /* ********************************************************************** */
   void Mutate(double Pop_MRate, double Org_MRate) {
     OrgPtr org;
     size_t siz = this->ScoreDexv.size();
@@ -231,7 +253,17 @@ public:
     for (int cnt=LastOrg-1; cnt>=FirstOrg; cnt--) {
       org = this->ScoreDexv[cnt];// lugar->tenant;
       org->Mutate_Me(Org_MRate);
+
+      /*
+      org->Node_Crossover(NULL);
+
+now how to do this? all gene receivers are next generation. receive from where? say from each other, or from anywhere.
+usually bad, like a mutation. maybe only one crossover event per generation.
+receive from? anywhere in pop, current gen.
+
+      */
     }
+    Crossover(Pop_MRate);
     org = this->ScoreDexv[LastOrg];// very last mutant is 100% randomized, to introduce 'new blood'
     org->Rand_Init();
   }
