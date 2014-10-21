@@ -472,7 +472,7 @@ void PopSession() {
     double avgscore1 = SumScore1/(double)(gencnt+1.0);
     FlywheelScore = (FlywheelScore*0.999) + (score1*0.001);
 
-    if (false) {
+    if (true) {
       int NumJacks = org0->GlobalJackVec.size();
       printf("Pop_Gen:%04li, s:%6.2f, %7.2f, %7.2f, numnodes:%3li, NumJacks:%1li: ", gencnt, score0, score1, AvgBeastScore, numnodes, NumJacks);
       printf("%7.2f, %7.2f ", avgscore0, avgscore1);

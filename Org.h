@@ -9,6 +9,7 @@ make 2 orgs, one for networks and one of simple vectors.
 #endif
 
 #include "Base.h"
+#include "Forwards.h"
 #include "FlexrayC.h"
 #include "Node.h"
 #include "Feed.h"
@@ -32,6 +33,7 @@ public:
   const static int NumScores = 2;
   double Score[NumScores];
   struct Lugar *home;// my location
+  PopBase* MyPop;
   NodeVec NGene;
   NodeVec *NGenePtr;
   IoJackVec GlobalJackVec;
@@ -42,7 +44,7 @@ public:
     for (int cnt=0; cnt<NumScores; cnt++) {
       this->Score[cnt] = 0.0;
     }
-    this->home = NULL;
+    this->home = NULL; this->MyPop = NULL;
     this->Invicto=false;
   }
   /* ********************************************************************** */
@@ -163,34 +165,44 @@ public:
     }
   }
   /* ********************************************************************** */
+  void Recomb_Me() {
+    double recombquota = 0.001;// 0.001 for testing
+    double rnum = frand();
+    if (rnum<recombquota) {
+      OrgPtr other = this->MyPop->GetRandomOrg();
+      if (other!=this){ // do not cross with self
+        NodePtr ndptr = other->Get_Random_Node();
+        this->Node_Crossover(ndptr);
+      }
+    }
+  }
+  /* ********************************************************************** */
   void Node_Crossover(NodePtr Other) {// recombination, assumes nodes are sorted by SpeciesId
     NodePtr resident, dupe;
+    resident = NULL;
     size_t ndex = TreeSearchMyNodes(0, Other->SpeciesId);
-    //if (ndex<this->NGene.size()){ resident = this->NGene.at(ndex); }
-    if((ndex<this->NGene.size()) && (resident = this->NGene.at(ndex))->SpeciesId == Other->SpeciesId){// replace
-    //if(resident->SpeciesId == Other->SpeciesId){// replace
-      delete resident;
+    if( (ndex<this->NGene.size()) && ((resident = this->NGene.at(ndex))->SpeciesId == Other->SpeciesId) ) { // replace
       dupe = Other->Spawn();
       this->NGene.at(ndex) = dupe;
-    }else{// insert
+      delete resident;
+    } else { // insert
       if (this->NGene.size()>=NodeNumLimit) {return;}
-      dupe = Other->Spawn();
-      this->NGene.insert(this->NGene.begin() + ndex, dupe);// first we would have to find the right index.
+      dupe = Other->Spawn(); this->NGene.insert(this->NGene.begin() + ndex, dupe);// first we would have to find the right index.
     }
     // this->NGene.push_back(dupe); Remove_Duplicate_Nodes();
 
     /*
-how to handle this? either block adding a node before the gene overflows, or first add it and then remove the dupe randomly afterward.
+    how to handle this? either block adding a node before the gene overflows, or first add it and then remove the dupe randomly afterward.
 
-but more importantly, if nodes are sorted in advance, we can search to the right place. if found, replace existing.
-if not found, insert. OR append and then sort.
+    but more importantly, if nodes are sorted in advance, we can search to the right place. if found, replace existing.
+    if not found, insert. OR append and then sort.
 
-if we added a lot, then we'd merge two parents.
+    if we added a lot, then we'd merge two parents.
 
-one: append, sort, remove if dupe (dupe remove requires re-packing the vector)
-two: find, replace if dupe or insert (insert requires re-packing the vector)
+    one: append, sort, remove if dupe (dupe remove requires re-packing the vector)
+    two: find, replace if dupe or insert (insert requires re-packing the vector)
 
-two is better if we can avoid sorting.
+    two is better if we can avoid sorting.
 
     */
   }
@@ -213,7 +225,7 @@ two is better if we can avoid sorting.
     return child;
   }
   /* ********************************************************************** */
-  NodePtr Get_Random_Node(){
+  NodePtr Get_Random_Node() {
     size_t dex = rand() % this->NGene.size();
     return (this->NGene.at(dex));
   }
@@ -284,7 +296,7 @@ two is better if we can avoid sorting.
       Guessed = Jack->UpwardValue;
       Real = Jack->GetValue();
       Error = (fabs(Real-Guessed))/2.0;
-      if (Error>Margin){
+      if (Error>Margin) {
         SuccessTemp = false; break;
       }
     }
@@ -307,7 +319,7 @@ two is better if we can avoid sorting.
       Error = (fabs(Real-Guessed))/2.0;// range 0.0 to 1.0
       Temp0 = (1.0-Error)+1.0;// range 1.0 to 2.0
       Temp1 = math_sgn(Guessed)*math_sgn(Real);
-      if (Error>Margin){ SuccessTemp = false; }
+      if (Error>Margin) { SuccessTemp = false; }
       SumScore0 *= Temp0;
       SumScore1 += Temp1;
     }

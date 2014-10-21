@@ -1,6 +1,7 @@
 #ifndef POP_H_INCLUDED
 #define POP_H_INCLUDED
 
+#include "Forwards.h"
 #include "Org.h"
 #include "Lugar.h"
 
@@ -12,7 +13,7 @@
 /* ********************************************************************** */
 class Pop;
 typedef Pop *PopPtr;
-class Pop {
+class Pop : PopBase {
 public:
   size_t popsz;
   LugarVec forestv;
@@ -38,6 +39,7 @@ public:
     BioGenCnt = 0;
     for (pcnt=0; pcnt<popsize; pcnt++) {
       lugar = new Lugar();
+      lugar->MyPop = this;
       org = Org::Abiogenate(); lugar->Attach_Tenant(org);
       forestv.at(pcnt) = lugar;
       ScoreDexv.at(pcnt) = org;
@@ -106,9 +108,9 @@ public:
     LugarPtr place;
 
     int RTerm;
-    if (false){
+    if (false) {
       RTerm = rand()%7;// advance the feed randomly so the Orgs will have to listen for the phase to guess right
-    }else{
+    } else {
       RTerm = BioGenCnt%7;// advance the feed arbitrarily each time so the Orgs will have to listen for the phase to guess right
     }
     for (int fcnt=0; fcnt<RTerm; fcnt++) {
@@ -118,7 +120,7 @@ public:
     for (int fcnt=0; fcnt<Fire_Test_Cycles; fcnt++) {
       this->GlobalFeed->NextGen();
       this->Fire_Cycle();
-      if (Start_Testing <= fcnt){
+      if (Start_Testing <= fcnt) {
         //this->Calculate_Score_And_Success(0.25);// must be within .25 of right answer (max dist is 1.0, any dist >=0.5 is digitally wrong)
         this->Calculate_Score_And_Success(0.45);// must be within .45 of right answer (max dist is 1.0, any dist >=0.5 is digitally wrong)
       }
@@ -221,28 +223,6 @@ public:
     }
   }
   /* ********************************************************************** */
-  void Crossover(size_t Num2Mutate) {
-    size_t FirstOrg, dex;
-    OrgPtr org_get, org_give;
-    NodePtr tnode;
-    size_t siz = this->ScoreDexv.size();
-    FirstOrg = siz-Num2Mutate;
-
-if (Num2Mutate<=0){
-    printf("Num2Mutate\n");
-  //throw 12345;
-}
-    dex = FirstOrg + (rand() % Num2Mutate);
-
-    org_get = this->ScoreDexv[dex];
-
-    dex = rand() % siz;
-    org_give = this->ScoreDexv[dex];
-    tnode = org_give->Get_Random_Node();
-
-    org_get->Node_Crossover(tnode);
-  }
-  /* ********************************************************************** */
   void Mutate(double Pop_MRate, double Org_MRate) {
     OrgPtr org;
     size_t siz = this->ScoreDexv.size();
@@ -253,17 +233,16 @@ if (Num2Mutate<=0){
     for (int cnt=LastOrg-1; cnt>=FirstOrg; cnt--) {
       org = this->ScoreDexv[cnt];// lugar->tenant;
       org->Mutate_Me(Org_MRate);
+      //org->Recomb_Me();
 
       /*
-      org->Node_Crossover(NULL);
-
-now how to do this? all gene receivers are next generation. receive from where? say from each other, or from anywhere.
-usually bad, like a mutation. maybe only one crossover event per generation.
-receive from? anywhere in pop, current gen.
+      now how to do this? all gene receivers are next generation. receive from where? say from each other, or from anywhere.
+      usually bad, like a mutation. maybe only one crossover event per generation.
+      receive from? anywhere in pop, current gen.
 
       */
     }
-    Crossover(Pop_MRate);
+    // Crossover(Pop_MRate);
     org = this->ScoreDexv[LastOrg];// very last mutant is 100% randomized, to introduce 'new blood'
     org->Rand_Init();
   }
@@ -277,35 +256,58 @@ receive from? anywhere in pop, current gen.
       if (frand()<Pop_MRate) {
         org = this->ScoreDexv[cnt];// lugar->tenant;
         org->Mutate_Me(Org_MRate);
+        //org->Recomb_Me();
       }
     }
     org = this->ScoreDexv[LastOrg];// very last mutant is 100% randomized, to introduce 'new blood'
     org->Rand_Init();
   }
-#if false
-for brainfarm, we really need good metrics.
-success is determined by being digitally close to answer within X limit for Y time (plateau) - then quit.
-but for each quit, play game over again from scratch, get Z trials and avg them. (maybe repeat until avg is stable.)
+  /* ********************************************************************** */
+  void CrossoverX(size_t Num2Mutate) {
+    size_t FirstOrg, dex;
+    OrgPtr org_get, org_give;
+    NodePtr tnode;
+    size_t siz = this->ScoreDexv.size();
+    FirstOrg = siz-Num2Mutate;
 
-also analog close?
+    if (Num2Mutate<=0) {
+      printf("Num2Mutate\n");
+      //throw 12345;
+    }
+    dex = FirstOrg + (rand() % Num2Mutate);
 
-VERY time consuming. what parameters are most important?
-start with easy goals, 2 or 3 at first
+    org_get = this->ScoreDexv[dex];
 
-ramp mutation pop rate0 is overall average rate
-rate2 = rate0*2;
-for (cnt = 0 to siz){
-  rate = (((double)cnt) / (double)siz)*rate2;
-  if (rand<rate){
+    dex = rand() % siz;
+    org_give = this->ScoreDexv[dex];
+    tnode = org_give->Get_Random_Node();
+
+    org_get->Node_Crossover(tnode);
   }
-}
-works until rate is over 0.5
+#if false
+  for brainfarm, we really need good metrics.
+  success is determined by being digitally close to answer within X limit for Y time (plateau) - then quit.
+      but for each quit, play game over again from scratch, get Z trials and avg them. (maybe repeat until avg is stable.)
 
-OR, just do the solid X percent of the pop, starting at bottom. no random about it.
+        also analog close?
+
+        VERY time consuming. what parameters are most important?
+        start with easy goals, 2 or 3 at first
+
+        ramp mutation pop rate0 is overall average rate
+        rate2 = rate0*2;
+  for (cnt = 0 to siz) {
+    rate = (((double)cnt) / (double)siz)*rate2;
+    if (rand<rate) {
+    }
+  }
+  works until rate is over 0.5
+
+  OR, just do the solid X percent of the pop, starting at bottom. no random about it.
 
 #endif
-  /* ********************************************************************** */
-  void Connect_Jacks(FeedPtr food) {
+    /* ********************************************************************** */
+    void Connect_Jacks(FeedPtr food) {
     size_t siz = this->forestv.size();
     for (int cnt=0; cnt<siz; cnt++) {
       LugarPtr lugar = this->forestv.at(cnt);
@@ -378,6 +380,12 @@ OR, just do the solid X percent of the pop, starting at bottom. no random about 
     }
     uvec->resize(UniqueCnt);
     siz = UniqueCnt;
+  }
+  /* ********************************************************************** */
+  OrgPtr GetRandomOrg() override {
+    size_t dex = rand() % this->popsz;
+    OrgPtr org = this->ScoreDexv.at(dex);
+    return org;
   }
 };
 

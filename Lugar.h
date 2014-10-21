@@ -14,6 +14,7 @@ public:
   uint32_t numnbrs;
   LugarPtr *nbrs;// array of nbrs for whatever topology
   LugarVec nbrsv;
+  PopBase* MyPop;
   /* ********************************************************************** */
   Lugar() {
     this->numnbrs = 0;
@@ -38,6 +39,7 @@ public:
   void Attach_Tenant(Org *tenant0) {
     this->tenant = tenant0;
     tenant->home = this;
+    tenant->MyPop = this->MyPop;
   }
   /* ********************************************************************** */
   void Attach_Next_Tenant(Org *tenant0) {

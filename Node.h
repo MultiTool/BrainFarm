@@ -136,6 +136,7 @@ public:
       delete this->LGenome.at(cnt);
     }
     this->LGenome.clear();// probably not necessary
+    this->IoSpeciesId = 0;// hacer no valido
   }
   /* ********************************************************************** */
   static NodePtr Abiogenate() {
@@ -167,7 +168,7 @@ public:
   NodePtr Spawn() {
     // this just clones everything. we need to think about mating and mutation.
     NodePtr parent, child;
-    LinkPtr lparent, lchild;
+    LinkPtr lnkparent, lnkchild;
     size_t siz = this->LGenome.size();
     child = new Node();
     child->MyType = this->MyType;
@@ -175,12 +176,12 @@ public:
     child->IoSpeciesId = this->IoSpeciesId;
     child->LGenome.resize(siz);
     for (size_t cnt=0; cnt<siz; cnt++) {
-      lparent = this->LGenome.at(cnt);
-      //bugprintf("lchild = lparent->Spawn(); cnt:%li, lparent:%p, bugcnt:%li\n", cnt, lparent, bugcnt);
-      lchild = lparent->Spawn();
+      lnkparent = this->LGenome.at(cnt);
+      //bugprintf("lnkchild = lnkparent->Spawn(); cnt:%li, lnkparent:%p, bugcnt:%li\n", cnt, lnkparent, bugcnt);
+      lnkchild = lnkparent->Spawn();
       bugcnt++;
-      //bugprintf("child->LGenome.at(cnt) = lchild;%li\n", cnt);
-      child->LGenome.at(cnt) = lchild;
+      //bugprintf("child->LGenome.at(cnt) = lnkchild;%li\n", cnt);
+      child->LGenome.at(cnt) = lnkchild;
     }
     return child;
   }
